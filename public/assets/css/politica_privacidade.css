@@ -1,0 +1,120 @@
+.politicaPrivacidade {
+    display: none;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: #FFF;
+    z-index: 9900;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+
+    /* Responsivo */
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+
+    /* Rolagem interna */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+
+    /* Força a barra de rolagem sempre visível no desktop */
+    scrollbar-width: thin; /* Firefox */
+}
+
+/* Chrome, Edge e Safari */
+.politicaPrivacidade::-webkit-scrollbar {
+    width: 8px;
+}
+
+.politicaPrivacidade::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.politicaPrivacidade::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+.politicaPrivacidade::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+#mascara {
+    display: none;
+    position: fixed !important;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7); /* já com transparência */
+    z-index: 9000;
+}
+
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    filter: alpha(opacity=70);
+    -moz-opacity: 0.7;
+    -khtml-opacity: 0.7;
+    opacity: 0.7;
+    z-index: 100;
+    display: none;
+}
+
+.cnt223 a {
+    text-decoration: none;
+}
+
+.popup {
+    width: 100%;
+    margin: 0 auto;
+    display: none;
+    position: fixed;
+    z-index: 101;
+}
+
+.cnt223 {
+    min-width: 600px;
+    width: 600px;
+    min-height: 150px;
+    margin: 100px auto;
+    background: #f3f3f3;
+    position: relative;
+    z-index: 103;
+    padding: 15px 35px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px #000;
+}
+
+.cnt223 p {
+    clear: both;
+    color: #555555;
+    /* text-align: justify; */
+    font-size: 20px;
+    font-family: sans-serif;
+}
+
+.cnt223 p a {
+    color: #d91900;
+    font-weight: bold;
+}
+
+.cnt223 .x {
+    float: right;
+    height: 35px;
+    left: 22px;
+    position: relative;
+    top: -25px;
+    width: 34px;
+}
+
+.cnt223 .x:hover {
+    cursor: pointer;
+}

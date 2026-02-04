@@ -1,0 +1,254 @@
+body {
+  font-family: "Arial", sans-serif;
+  background-color: #f8f9fa;
+  padding-top: 20px;
+}
+
+.main-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.card-header {
+  background: #f8f9fa;
+  padding: 15px 20px;
+  border-bottom: 1px solid #dee2e6;
+  font-weight: bold;
+  border-radius: 10px 10px 0 0;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+.mesa-info {
+  background: #e8f5e8;
+  border-left: 4px solid #28a745;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+}
+
+.categoria-tab {
+  margin-bottom: 20px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.categoria-header {
+  background: #007bff;
+  color: white;
+  padding: 15px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.categoria-header:hover {
+  background: #0056b3;
+}
+
+.categoria-header.active {
+  background: #28a745;
+}
+
+.categoria-content {
+  display: none;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-top: none;
+}
+
+.categoria-content.active {
+  display: block;
+}
+
+.item-list {
+  padding: 0;
+}
+
+.item-card {
+  border-bottom: 1px solid #dee2e6;
+  padding: 15px;
+  transition: background 0.3s;
+  text-align: center;
+}
+
+.item-card:hover {
+  background: #f8f9fa;
+}
+
+.item-card:last-child {
+  border-bottom: none;
+}
+
+.item-nome {
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.item-descricao {
+  color: #666;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.item-preco {
+  color: #28a745;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.item-actions {
+  margin-top: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.qty-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.qty-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.qty-btn:hover {
+  background: #0056b3;
+}
+
+.qty-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.qty-input {
+  width: 70px;
+  height: 35px;
+  text-align: center;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  padding: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  background: #f8f9fa;
+}
+
+.qty-input:focus {
+  border-color: #007bff;
+  outline: none;
+  background: white;
+}
+
+.carrinho-fixo {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #28a745;
+  color: white;
+  border-radius: 50px;
+  padding: 15px 25px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  z-index: 1000;
+  transition: all 0.3s;
+}
+
+.carrinho-fixo:hover {
+  background: #218838;
+  transform: scale(1.05);
+}
+
+.carrinho-badge {
+  background: #dc3545;
+  border-radius: 50%;
+  padding: 5px 8px;
+  margin-left: 10px;
+  font-size: 12px;
+}
+
+.btn-back {
+  background: #6c757d;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  text-decoration: none;
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+.btn-back:hover {
+  background: #5a6268;
+  color: white;
+  text-decoration: none;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+.item-obs {
+  margin-top: 10px;
+}
+
+.item-obs textarea {
+  width: 100%;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  padding: 8px;
+  resize: vertical;
+  min-height: 60px;
+}
+
+.modal-pedido .modal-dialog {
+  max-width: 600px;
+}
+
+.resumo-item {
+  border-bottom: 1px solid #eee;
+  padding: 10px 0;
+}
+
+.resumo-item:last-child {
+  border-bottom: none;
+}
+
+.total-geral {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 5px;
+  margin-top: 15px;
+}

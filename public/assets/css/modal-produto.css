@@ -1,0 +1,806 @@
+/* Modal de Detalhes do Produto - Estilo Profissional */
+
+.modal-itens .modal-dialog {
+    margin: 10px;
+    max-width: 95%;
+}
+
+.modal-itens .modal-content {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+.modal-itens .modal-header {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border-radius: 16px 16px 0 0;
+    padding: 20px;
+    border: none;
+}
+
+.modal-itens .modal-header .close {
+    color: white;
+    opacity: 1;
+    font-size: 28px;
+    font-weight: 300;
+    text-shadow: none;
+}
+
+.modal-itens .modal-title {
+    font-size: 18px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.modal-itens .modal-body {
+    padding: 20px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+/* Informação do Produto */
+.produto-info-header {
+    background: #f8f9fa;
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #e9ecef;
+}
+
+.produto-info-header .produto-nome {
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.produto-info-header .produto-descricao {
+    font-size: 13px;
+    color: #28a745;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+.produto-info-header .produto-preco {
+    font-size: 24px;
+    font-weight: 700;
+    color: #28a745;
+}
+
+/* Seções de Opções */
+.opcoes-section {
+    margin-bottom: 20px;
+    padding: 12px;
+    border-radius: 8px;
+    background: #fff;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+/* Estado de erro para grupos obrigatórios não selecionados */
+.opcoes-section-error {
+    border-color: #dc3545 !important;
+    background: #fff5f5 !important;
+    animation: shake 0.4s ease-in-out;
+}
+
+.opcoes-section-error .opcoes-section-title {
+    color: #dc3545 !important;
+}
+
+.opcoes-section-error .badge-required {
+    background: #dc3545 !important;
+    animation: pulse-error 0.6s ease-in-out 3;
+}
+
+/* Animação de shake para seção com erro */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+}
+
+/* Animação de pulse para badge obrigatório */
+@keyframes pulse-error {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+}
+
+.opcoes-section-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #28a745;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.opcoes-section-title .badge-required {
+    background: #28a745;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.opcoes-section-title .badge-optional {
+    background: #6c757d;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+/* Cards de Opções */
+.opcao-card {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 10px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.opcao-card:hover {
+    border-color: #28a745;
+    background: #f8fff9;
+}
+
+.opcao-card.selected {
+    border-color: #28a745;
+    background: #e8f8ec;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2);
+    animation: pulse-select 0.3s ease;
+}
+
+@keyframes pulse-select {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.02);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Ícone de check customizado para melhor visualização */
+.opcao-card input[type="checkbox"]:checked,
+.opcao-card input[type="radio"]:checked {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.opcao-card {
+    position: relative;
+}
+
+.opcao-card label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin: 0;
+    cursor: pointer;
+}
+
+/* Checkboxes e Radios Customizados */
+.modal-itens input[type="checkbox"],
+.modal-itens input[type="radio"] {
+    position: relative !important;
+    left: auto !important;
+    width: 22px;
+    height: 22px;
+    margin-right: 12px;
+    cursor: pointer;
+    flex-shrink: 0;
+    accent-color: #28a745;
+    opacity: 1 !important;
+}
+
+.opcao-card input[type="checkbox"],
+.opcao-card input[type="radio"] {
+    width: 22px;
+    height: 22px;
+    margin-right: 12px;
+    cursor: pointer;
+    flex-shrink: 0;
+    accent-color: #28a745;
+    position: relative !important;
+    left: auto !important;
+    opacity: 1 !important;
+}
+
+/* Forņa visibilidade dos checkboxes */
+.opcao-card input[type="checkbox"],
+.opcao-card input[type="radio"] {
+    opacity: 1 !important;
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+}
+
+.opcao-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.opcao-nome {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    text-transform: capitalize;
+}
+
+.opcao-descricao {
+    font-size: 11px;
+    color: #6c757d;
+}
+
+.opcao-preco {
+    font-size: 14px;
+    font-weight: 700;
+    color: #28a745;
+    white-space: nowrap;
+    margin-left: 8px;
+}
+
+.opcao-preco.gratis {
+    color: #6c757d;
+    font-weight: 400;
+}
+
+/* Lista de Sabores */
+.lista-sabores {
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.lista-sabores label {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.lista-sabores label:hover {
+    border-color: #28a745;
+    background: #f8fff9;
+}
+
+.lista-sabores label.selected {
+    border-color: #28a745;
+    background: #e8f8ec;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2);
+}
+
+.lista-sabores input[type="checkbox"]:checked + .label-text {
+    font-weight: 600;
+}
+
+.lista-sabores input[type="checkbox"]:checked ~ * {
+    border-color: #28a745;
+}
+
+/* Footer do Modal - Fixo no rodapé */
+.modal-itens .modal-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 12px 16px;
+    border-top: 1px solid #e9ecef;
+    background: white;
+    border-radius: 0;
+    z-index: 1000;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    gap: 10px;
+}
+
+.modal-itens .modal-footer .btn {
+    flex: 1;
+    margin: 0;
+    padding: 12px;
+    font-size: 14px;
+}
+
+.modal-itens .modal-footer .btn-block {
+    width: auto;
+}
+
+.modal-itens .modal-content {
+    padding-bottom: 70px; /* Espaço para o footer fixo */
+}
+
+.modal-itens .modal-body {
+    padding-bottom: 80px; /* Espaço extra para não ficar atrás do botão */
+    max-height: calc(100vh - 200px);
+}
+
+.modal-itens .modal-footer .btn {
+    border-radius: 8px;
+    padding: 14px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.modal-itens .modal-footer .btn-primary {
+    background: #28a745;
+    color: white;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.modal-itens .modal-footer .btn-primary:hover {
+    background: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4);
+}
+
+.modal-itens .modal-footer .btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Animação de shake para botão quando validar erro */
+.btn-shake {
+    animation: btn-shake 0.4s ease-in-out;
+}
+
+@keyframes btn-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+}
+
+.modal-itens .modal-footer .btn-default {
+    background: #f8f9fa !important;
+    color: #495057 !important;
+    border: 2px solid #dee2e6 !important;
+    font-weight: 600 !important;
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    min-width: 100px !important;
+}
+
+.modal-itens .modal-footer .btn-default:hover {
+    background: #e9ecef !important;
+    border-color: #28a745 !important;
+    color: #28a745 !important;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2) !important;
+}
+
+/* Total Calculator */
+.total-calculator {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    padding: 16px;
+    border-radius: 10px;
+    margin: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.total-calculator .total-label {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.total-calculator .total-value {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+/* Quantity Selector */
+.quantity-selector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.quantity-selector button {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid #28a745;
+    background: white;
+    color: #28a745;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.quantity-selector button:hover {
+    background: #28a745;
+    color: white;
+    transform: scale(1.1);
+}
+
+.quantity-selector button:active {
+    transform: scale(0.95);
+}
+
+.quantity-selector .quantity-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #333;
+    min-width: 40px;
+    text-align: center;
+}
+
+/* Scrollbar customizado */
+.modal-itens .modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-itens .modal-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.modal-itens .modal-body::-webkit-scrollbar-thumb {
+    background: #28a745;
+    border-radius: 10px;
+}
+
+.modal-itens .modal-body::-webkit-scrollbar-thumb:hover {
+    background: #218838;
+}
+
+/* Responsive */
+@media (min-width: 768px) {
+    .modal-itens .modal-dialog {
+        max-width: 600px;
+        margin: 30px auto;
+    }
+}
+
+/* Separador entre grupos */
+.opcoes-section + .opcoes-section {
+    padding-top: 20px;
+    border-top: 1px dashed #dee2e6;
+}
+
+/* Ícone de carrinho flutuante */
+.floating-cart-badge {
+    position: fixed;
+    top: 70px;
+    right: 16px;
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.floating-cart-badge.show {
+    display: flex;
+    animation: bounceIn 0.5s ease;
+}
+
+.floating-cart-badge:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(40, 167, 69, 0.5);
+}
+
+.floating-cart-badge:active {
+    transform: scale(0.95);
+}
+
+.floating-cart-badge .cart-icon {
+    color: white;
+    font-size: 24px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.floating-cart-badge .cart-count {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background: #dc3545;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    border: 2px solid white;
+}
+
+/* Popup de itens selecionados */
+.selected-items-popup {
+    position: fixed;
+    top: 130px;
+    right: 16px;
+    width: 280px;
+    max-height: 400px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    z-index: 9998;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.selected-items-popup.show {
+    display: flex;
+    animation: slideDown 0.3s ease;
+}
+
+.selected-items-popup-header {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    padding: 12px 16px;
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.selected-items-popup-header .close-popup {
+    background: rgba(255, 255, 255, 0.3);
+    border: none;
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.selected-items-popup-body {
+    padding: 12px;
+    overflow-y: auto;
+    max-height: 320px;
+}
+
+.selected-item-row {
+    padding: 8px;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+}
+
+.selected-item-row.produto-principal {
+    background: #f8f9fa;
+    font-weight: 600;
+    padding: 10px 8px;
+    border-bottom: 2px solid #28a745;
+}
+
+.selected-item-row.produto-principal .item-name {
+    color: #28a745;
+    font-weight: 700;
+}
+
+.selected-item-row:last-child {
+    border-bottom: none;
+}
+
+.selected-item-row .item-name {
+    flex: 1;
+    color: #333;
+    font-weight: 500;
+}
+
+.selected-item-row .item-price {
+    color: #28a745;
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+.selected-item-row .remove-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 12px;
+    margin-left: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.selected-items-popup-footer {
+    padding: 12px;
+    border-top: 1px solid #e9ecef;
+    background: #f8f9fa;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+}
+
+.selected-items-popup-footer .total-label {
+    color: #333;
+    font-size: 14px;
+}
+
+.selected-items-popup-footer .total-value {
+    color: #28a745;
+    font-size: 16px;
+}
+
+@keyframes slideDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Esconde a barra antiga */
+.selected-items-bar {
+    display: none !important;
+}
+
+.selected-item-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.selected-item-chip:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.selected-item-chip .remove-icon {
+    width: 18px;
+    height: 18px;
+    background: #dc3545;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.selected-item-chip.price-indicator {
+    background: rgba(255, 255, 255, 0.3);
+    color: white;
+    font-weight: 700;
+    pointer-events: none;
+}
+
+/* Animação de voo do item */
+.flying-item {
+    position: fixed;
+    z-index: 10001;
+    pointer-events: none;
+    transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.flying-item.animate {
+    opacity: 0;
+    transform: scale(0.3);
+}
+
+/* Ajuste do modal quando a barra está visível */
+body.has-selected-items .modal-itens .modal-body {
+    max-height: calc(60vh - 60px);
+}
+
+/* Scrollbar customizado para a barra de itens selecionados */
+.selected-items-container::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+}
+
+.selected-items-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+.selected-items-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+}
+
+.selected-items-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.7);
+}
+
+/* Responsivo para telas menores */
+@media (max-width: 768px) {
+    .selected-items-bar {
+        width: 95%;
+        max-width: 95%;
+    }
+}
+
+/* Efeito visual ao selecionar sabor */
+.lista-sabores.selected {
+    animation: pulse-select 0.3s ease;
+}
+
+.lista-sabores label.selected {
+    border-color: #28a745;
+    background: #e8f8ec;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2);
+}

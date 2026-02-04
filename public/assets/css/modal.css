@@ -1,0 +1,219 @@
+label {
+    position: relative;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: normal;
+    vertical-align: middle !important;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+    position: absolute;
+    right: 9000px;
+}
+
+
+/*Check box*/
+
+input[type="checkbox"]+.label-text:before {
+    content: "\f096";
+    font-family: "FontAwesome";
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    width: 1em;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+input[type="checkbox"]:checked+.label-text:before {
+    content: "\f14a";
+    /*color: #2980b9;*/
+    color: #8e44ad;
+    animation: effect 250ms ease-in;
+}
+
+input[type="checkbox"]:disabled+.label-text {
+    color: #aaa;
+}
+
+input[type="checkbox"]:disabled+.label-text:before {
+    content: "\f0c8";
+    color: #ccc;
+}
+
+
+/*Radio box*/
+
+input[type="radio"]+.label-text:before {
+    content: "\f10c";
+    font-family: "FontAwesome";
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    width: 1em;
+    display: inline-block;
+    margin-right: 5px;
+    vertical-align: middle !important;
+}
+
+input[type="radio"]:checked+.label-text:before {
+    content: "\f192";
+    color: #8e44ad;
+    animation: effect 250ms ease-in;
+}
+
+input[type="radio"]:disabled+.label-text {
+    color: #aaa;
+}
+
+input[type="radio"]:disabled+.label-text:before {
+    content: "\f111";
+    color: #ccc;
+}
+
+@media screen and (max-width: 768px) and (min-width: 320px) {
+    .modal-dialog {
+        width: 100% !important;
+        height: 100% !important;
+        margin: 0;
+        padding: 0;
+    }
+    .modal-content {
+        height: auto;
+        min-height: 100% !important;
+        border-radius: 0;
+    }
+    .toggle input[type="radio"]+.label-text:before {
+        content: "\f204";
+        font-family: "FontAwesome";
+        speak: none;
+        font-style: normal;
+        font-weight: normal;
+        font-variant: normal;
+        text-transform: none;
+        line-height: 1;
+        -webkit-font-smoothing: antialiased;
+        width: 1em;
+        display: inline-block;
+        margin-right: 10px;
+        vertical-align: middle !important;
+    }
+    .toggle input[type="radio"]:checked+.label-text:before {
+        content: "\f205";
+        color: #16a085;
+        animation: effect 250ms ease-in;
+    }
+    .toggle input[type="radio"]:disabled+.label-text {
+        color: #aaa;
+    }
+    .toggle input[type="radio"]:disabled+.label-text:before {
+        content: "\f204";
+        color: #ccc;
+    }
+    @keyframes effect {
+        0% {
+            transform: scale(0);
+        }
+        25% {
+            transform: scale(1.3);
+        }
+        75% {
+            transform: scale(1.4);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+    .modal.left .modal-dialog,
+    .modal.right .modal-dialog {
+        position: fixed;
+        margin: auto;
+        width: 320px;
+        height: 100%;
+        -webkit-transform: translate3d(0%, 0, 0);
+        -ms-transform: translate3d(0%, 0, 0);
+        -o-transform: translate3d(0%, 0, 0);
+        transform: translate3d(0%, 0, 0);
+    }
+    .modal.left .modal-content,
+    .modal.right .modal-content {
+        height: 100%;
+        overflow-y: auto;
+    }
+    .modal.left .modal-body,
+    .modal.right .modal-body {
+        padding: 15px 15px 80px;
+    }
+    /*Left*/
+    .modal.left.fade .modal-dialog {
+        left: -320px;
+        -webkit-transition: opacity 0.3s linear, left 0.3s ease-out;
+        -moz-transition: opacity 0.3s linear, left 0.3s ease-out;
+        -o-transition: opacity 0.3s linear, left 0.3s ease-out;
+        transition: opacity 0.3s linear, left 0.3s ease-out;
+    }
+    .modal.left.fade.in .modal-dialog {
+        left: 0;
+    }
+    /*Right*/
+    .modal.right.fade .modal-dialog {
+        right: -320px;
+        -webkit-transition: opacity 0.3s linear, right 0.3s ease-out;
+        -moz-transition: opacity 0.3s linear, right 0.3s ease-out;
+        -o-transition: opacity 0.3s linear, right 0.3s ease-out;
+        transition: opacity 0.3s linear, right 0.3s ease-out;
+    }
+    .modal.right.fade.in .modal-dialog {
+        right: 0;
+    }
+}
+
+@media screen and (min-width: 900px) {
+    .modal-dialog {
+        width: 80% !important;
+        height: 97% !important;
+        margin: 0 auto;
+        padding: 0;
+    }
+    .modal-content {
+        height: auto;
+        min-height: 100% !important;
+        border-radius: 0;
+    }
+}
+
+:root {
+    --ion-safe-area-top: 20px;
+    --ion-safe-area-bottom: 22px;
+}
+
+ion-col>div {
+    background-color: #f7f7f7;
+    border: solid 1px #ddd;
+    padding: 10px;
+}
+
+.card-title {
+    text-align: center;
+    position: relative;
+    bottom: 0;
+    font-size: .8em;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    background-color: rgba(0, 0, 255, 0.3);
+    padding: 10px 10px 10px 20px;
+}
+
+a:link {
+    text-decoration: none;
+}
