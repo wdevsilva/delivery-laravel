@@ -18,6 +18,14 @@ use App\Http\Controllers\Mesa\GarconController;
 // Home
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+// Manifest PWA
+Route::get('/generate-manifest.php', function() {
+    ob_start();
+    include public_path('generate-manifest.php');
+    $content = ob_get_clean();
+    return response($content)->header('Content-Type', 'application/json');
+});
+
 // Autenticação Admin
 Route::prefix('login')->group(function () {
     Route::get('/', [LoginController::class, 'index'])->name('login');
@@ -40,7 +48,7 @@ Route::prefix('cliente')->group(function () {
 // Rotas Públicas - Cardápio e Produtos
 Route::get('/promocoes', [ItemController::class, 'promocoes'])->name('promocoes');
 Route::get('/item/{id}', [ItemController::class, 'show'])->name('item.show');
-Route::get('/categoria/{id}', [ItemController::class, 'categoria'])->name('categoria.show');
+Route::get('/categoria/{id}', [App\Http\Controllers\CategoriaController::class, 'show'])->name('categoria.show');
 
 // Carrinho (público)
 Route::prefix('carrinho')->group(function () {
@@ -50,6 +58,12 @@ Route::prefix('carrinho')->group(function () {
     Route::post('/atualizar', [CarrinhoController::class, 'atualizar'])->name('carrinho.atualizar');
     Route::get('/checkout', [CarrinhoController::class, 'checkout'])->name('carrinho.checkout');
     Route::post('/finalizar', [CarrinhoController::class, 'finalizar'])->name('carrinho.finalizar');
+
+    // Rotas AJAX para atualização do carrinho
+    Route::match(['GET', 'POST'], '/reload', [CarrinhoController::class, 'reload']);
+    Route::post('/get_count_js', [CarrinhoController::class, 'getCountJs']);
+    Route::post('/get_count_bag', [CarrinhoController::class, 'getCountBag']);
+    Route::post('/dispensar_bebidas', [CarrinhoController::class, 'dispensarBebidas']);
 });
 
 // Cupons

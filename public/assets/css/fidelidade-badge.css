@@ -1,0 +1,125 @@
+.fidelidade-badge {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    z-index: 999;
+    max-width: 350px;
+    animation: slideInRight 0.5s ease-out;
+}
+
+.fidelidade-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: relative;
+}
+
+.fidelidade-icon {
+    font-size: 32px;
+    animation: bounce 2s infinite;
+}
+
+.fidelidade-info {
+    flex: 1;
+}
+
+.fidelidade-info strong {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.fidelidade-info p {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    opacity: 0.95;
+}
+
+.fidelidade-progress {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 8px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #FFD700, #FFA500);
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+
+.progress-text {
+    font-size: 12px;
+    font-weight: bold;
+    min-width: 35px;
+}
+
+.btn-fechar {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 20px;
+    transition: all 0.3s;
+}
+
+.btn-fechar:hover {
+    background: rgba(255,255,255,0.3);
+    transform: rotate(90deg);
+}
+
+.fidelidade-badge.tem-desconto {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    animation: pulse-success 1.5s infinite;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-success {
+    0%, 100% { box-shadow: 0 8px 25px rgba(56, 239, 125, 0.4); }
+    50% { box-shadow: 0 8px 35px rgba(56, 239, 125, 0.7); }
+}
+
+@media (max-width: 768px) {
+    .fidelidade-badge {
+        top: auto;
+        bottom: 140px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}

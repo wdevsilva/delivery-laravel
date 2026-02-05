@@ -16,13 +16,13 @@
 }
 
 .Coupon--couponItem--1EfTMUI.Coupon--store--14BPOBb {
-    background: url('../../midias/img/cupom.webp') no-repeat 0 0;
+    background: url('../img/cupom.webp') no-repeat 0 0;
     background-size: 100% 100%
 }
 
 .Coupon--couponItem--1EfTMUI.Coupon--store--14BPOBb.Coupon--EXPIRED--3ncFpBg,
 .Coupon--couponItem--1EfTMUI.Coupon--store--14BPOBb.Coupon--USED--jT6QLk1 {
-    background: url('../../midias/img/cupom2.webp') no-repeat 0 0;
+    background: url('../img/cupom2.webp') no-repeat 0 0;
     background-size: 100% 100%;
     cursor: auto
 }
@@ -37,13 +37,13 @@
 }
 
 .Coupon--couponItem--1EfTMUI.Coupon--plat--3GEc-no {
-    background: url('../../midias/img/cupom_vencido.webp') no-repeat 0 0;
+    background: url('../img/cupom_vencido.webp') no-repeat 0 0;
     background-size: 100% 100%
 }
 
 .Coupon--couponItem--1EfTMUI.Coupon--plat--3GEc-no.Coupon--EXPIRED--3ncFpBg,
 .Coupon--couponItem--1EfTMUI.Coupon--plat--3GEc-no.Coupon--USED--jT6QLk1 {
-    background: url('../../midias/img/cupom_vencido2.webp') no-repeat 0 0;
+    background: url('../img/cupom_vencido2.webp') no-repeat 0 0;
     background-size: 100% 100%;
     cursor: auto
 }

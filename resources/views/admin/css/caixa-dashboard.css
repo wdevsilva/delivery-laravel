@@ -1,0 +1,103 @@
+.caixa-stats {
+  margin-bottom: 20px;
+}
+
+.mesa-card {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  transition: all 0.3s ease;
+}
+
+.mesa-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.mesa-header {
+  background: #f8f9fa;
+  padding: 15px;
+  border-bottom: 1px solid #ddd;
+  border-radius: 5px 5px 0 0;
+}
+
+.mesa-body {
+  padding: 15px;
+}
+
+.mesa-footer {
+  padding: 10px 15px;
+  background: #f8f9fa;
+  border-top: 1px solid #ddd;
+  border-radius: 0 0 5px 5px;
+}
+
+.status-entregue {
+  background: #d4edda;
+  border-color: #c3e6cb;
+}
+
+.status-pendente {
+  background: #fff3cd;
+  border-color: #ffeaa7;
+}
+
+.status-sem-pedidos {
+  background: #f8d7da;
+  border-color: #f5c6cb;
+}
+
+.valor-total {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #28a745;
+}
+
+.tempo-ocupacao {
+  color: #6c757d;
+  font-size: 0.9em;
+}
+
+.btn-fechar-mesa {
+  background: #28a745;
+  border-color: #28a745;
+  color: white;
+}
+
+.btn-fechar-mesa:hover {
+  background: #218838;
+  border-color: #1e7e34;
+  color: white;
+}
+
+.alert-no-mesas {
+  text-align: center;
+  padding: 40px;
+}
+
+.stats-box {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.stats-number {
+  font-size: 2.5em;
+  font-weight: bold;
+  color: #007bff;
+}
+
+.stats-label {
+  color: #6c757d;
+  font-size: 0.9em;
+  text-transform: uppercase;
+  padding: 10px;
+}
+
+.refresh-indicator {
+  display: none;
+  color: #007bff;
+}

@@ -2,7 +2,7 @@
 
 ## Status Atual da Migração
 
-### ✅ Concluído
+###  Concluído
 1. **Projeto Laravel criado** em `/var/www/html/delivery-laravel`
 2. **Configuração inicial do .env** com:
    - Banco de dados MySQL (delivery)
@@ -28,6 +28,14 @@
    - API RESTful com Sanctum para app mobile
 7. **Views Blade criadas**:
    - Layout principal (app.blade.php) com Bootstrap 5
+   - **Layout site (site.blade.php)** com template idêntico ao sistema antigo:
+     - Loading screen animado com logo
+     - Bootstrap 3.3.5 (compatível com sistema antigo)
+     - Font Awesome 4.4.0
+     - Select2, Gritter, Slick carousel
+     - Meta tags Open Graph para WhatsApp
+     - Manifest PWA dinâmico
+     - Sistema de cores customizável
    - Página inicial demonstrativa
    - Estrutura de diretórios para admin, cliente, garcon
 8. **Servidor Laravel rodando**:

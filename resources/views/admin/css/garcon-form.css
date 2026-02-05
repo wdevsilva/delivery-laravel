@@ -1,0 +1,197 @@
+/* Garcon Form Styles - Matching Caixa Dashboard Structure */
+.garcon-stats {
+    margin-bottom: 20px;
+}
+
+.form-card {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+    background: white;
+    padding: 0;
+}
+
+.form-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.form-header {
+    background: #f8f9fa;
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    border-radius: 5px 5px 0 0;
+}
+
+.form-body {
+    padding: 15px;
+}
+
+.form-footer {
+    padding: 10px 15px;
+    background: #f8f9fa;
+    border-top: 1px solid #ddd;
+    border-radius: 0 0 5px 5px;
+}
+
+.form-status {
+    font-weight: bold;
+}
+
+.stats-box {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+}
+
+.stats-box:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.stats-number {
+    font-weight: bold;
+    color: #007bff;
+}
+
+.stats-label {
+    color: #6c757d;
+    text-transform: uppercase;
+    padding: 10px;
+}
+
+.floating-label {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.floating-label input,
+.floating-label select {
+    width: 100%;
+    padding: 15px 12px 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: white;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.floating-label input:focus,
+.floating-label select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+}
+
+.floating-label label {
+    position: absolute;
+    top: 15px;
+    left: 12px;
+    color: #6c757d;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    background: white;
+    padding: 0 4px;
+}
+
+.floating-label input:focus + label,
+.floating-label input:not(:placeholder-shown) + label,
+.floating-label select:focus + label {
+    top: -8px;
+    left: 8px;
+    color: #007bff;
+    font-weight: 600;
+}
+
+.nivel-atual {
+    color: #007bff;
+    font-weight: bold;
+}
+
+.nivel-row {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.nivel-row:hover {
+    background-color: #f8f9fa;
+}
+
+.nivel-row input[type="radio"]:checked {
+    background-color: #007bff;
+}
+
+.refresh-indicator {
+    display: none;
+    color: #007bff;
+}
+
+.btn-group-form {
+    display: inline-block;
+}
+
+.btn-group-form .btn {
+    margin-left: 5px;
+}
+
+.table-responsive {
+    margin-top: 10px;
+}
+
+.table-sm th,
+.table-sm td {
+    padding: 8px;
+    vertical-align: middle;
+}
+
+.table-bordered {
+    border: 1px solid #ddd;
+}
+
+.table-bordered th,
+.table-bordered td {
+    border: 1px solid #ddd;
+}
+
+.table thead th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+/* Status indicators similar to caixa */
+.label {
+    display: inline;
+    padding: .2em .6em .3em;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25em;
+}
+
+.label-primary {
+    background-color: #007bff;
+}
+
+.label-success {
+    background-color: #28a745;
+}
+
+.label-info {
+    background-color: #17a2b8;
+}
+
+.label-warning {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.label-danger {
+    background-color: #dc3545;
+}

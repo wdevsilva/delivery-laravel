@@ -1,0 +1,345 @@
+<?php
+
+$maisVendidos = $data['maisVendidos'] ?? [];
+
+// Caminho base da imagem padrão
+$semFoto = "$baseUri/assets/item/semfoto.jpg";
+
+if (!empty($maisVendidos)) {
+?>
+    <div class="mais-vendidos-section">
+        <h2 class="section-title">Mais Pedidos</h2>
+        <div class="mais-vendidos-slick" id="topSold" aria-label="Carrossel dos itens mais pedidos">
+        <?php
+        $maisVendidos = $data['maisVendidos'];
+
+        // Ordena: produtos com estoque primeiro, depois sem estoque
+        usort($maisVendidos, function($a, $b) {
+            // Se A tem estoque e B não tem, A vem primeiro
+            if ($a['item_estoque'] > 0 && $b['item_estoque'] <= 0) return -1;
+            // Se B tem estoque e A não tem, B vem primeiro
+            if ($b['item_estoque'] > 0 && $a['item_estoque'] <= 0) return 1;
+            // Se ambos têm ou ambos não têm estoque, ordena por vendas
+            return $b['media_vendida'] <=> $a['media_vendida'];
+        });
+
+        // Pega os top 3 vendidos ENTRE TODOS (com e sem estoque) para marcar a tag
+        $todosOrdenadosPorVendas = $maisVendidos;
+        usort($todosOrdenadosPorVendas, fn($a, $b) => $b['media_vendida'] <=> $a['media_vendida']);
+        $top3_vendidos = array_slice($todosOrdenadosPorVendas, 0, 3);
+        // Usa os IDs dos top 3 para comparação unívoca
+        $top3_ids = array_map(fn($item) => $item['item_id'], $top3_vendidos);
+        
+        // Embaralha para exibição aleatória (mas mantém produtos com estoque primeiro)
+        $produtosComEstoque = array_filter($maisVendidos, fn($item) => $item['item_estoque'] > 0);
+        $produtosSemEstoque = array_filter($maisVendidos, fn($item) => $item['item_estoque'] <= 0);
+        shuffle($produtosComEstoque);
+        shuffle($produtosSemEstoque);
+        $maisVendidos = array_merge($produtosComEstoque, $produtosSemEstoque);
+
+        foreach ($maisVendidos as $index => $item) {
+            // Verifica se tem estoque
+            $semEstoque = ($item['item_estoque'] <= 0);
+
+            // Monta URL da imagem
+            $item_foto = isset($item['item_foto'])
+                ? "$baseUri/assets/item/{$_SESSION['base_delivery']}/{$item['item_foto']}"
+                : $semFoto;
+
+            // Usa a foto do item diretamente
+            $img_url = $item_foto;
+        ?>
+            <article class="card <?= $semEstoque ? 'produto-sem-estoque' : '' ?>" data-id="<?= $item['item_id'] ?>">
+                <div class="card-img-wrapper" style="position: relative;">
+                    <?php if ($semEstoque): ?>
+                        <div style="position: absolute; top: 8px; right: 8px; background: #dc3545; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; z-index: 10; text-transform: uppercase;">ESGOTADO</div>
+                    <?php endif; ?>
+                    <img src="<?= htmlspecialchars($img_url) ?>" 
+                         alt="<?= htmlspecialchars($item['item_nome']) ?>"
+                         style="<?= $semEstoque ? 'filter: grayscale(100%); opacity: 0.6;' : '' ?>"
+                         onerror="this.onerror=null; this.src='<?= $semFoto ?>';">
+
+                    <div class="tags-container">
+                        <?php if (in_array($item['item_id'], $top3_ids)) { ?>
+                            <div class="tag-hot" data-id="<?= $item['item_id']; ?>" aria-hidden="true">🔥 Mais vendido</div>
+                        <?php } ?>
+                        <?php if ($item['item_promo'] == 1) { ?>
+                            <div class="tag-promo" data-id="<?= $item['item_id']; ?>" aria-hidden="true">💥 Promoção</div>
+                        <?php } ?>
+                    </div>
+                </div>
+                <div class="card-body" style="<?= $semEstoque ? 'opacity: 0.7;' : '' ?>">
+                    <div class="card-category-conteudo">
+                        <div class="card-category-mais-vendidos"><b><?= $item['categoria']; ?></b></div>
+                        <div class="card-title-mais-vendidos"><b><?= htmlspecialchars($item['item_nome']); ?></b></div>
+                        <?php if (!empty($item['item_obs'])) { ?>
+                            <div class="card-description"><strong>Ingredientes:</strong> <?= htmlspecialchars(strip_tags($item['item_obs'])); ?></div>
+                        <?php } ?>
+                        <?php if (!empty($item['item_desc'])) { ?>
+                            <div class="card-description"><strong>Descrição Breve:</strong> <?= htmlspecialchars(strip_tags($item['item_desc'])); ?></div>
+                        <?php } ?>
+                    </div>
+                    <div class="card-price-mais-vendidos">
+                        <b>R$ <?= number_format($item['item_preco'], 2, ',', '.'); ?></b>
+                        <?php if ($semEstoque): ?>
+                            <br><span style="color: #dc3545; font-size: 11px; font-weight: bold;">• SEM ESTOQUE</span>
+                        <?php endif; ?>
+                    </div>
+                    <?php 
+                    // Verifica se deve abrir modal:
+                    // - APENAS se tem opções/adicionais
+                    // - Descrição/ingredientes NÃO forçam abertura do modal
+                    $temOpcoes = (isset($item['opcoes'][0]) && count($item['opcoes']) > 0);
+                    $deveAbrirModal = $temOpcoes;
+                    ?>
+                    <?php if (!$semEstoque): ?>
+                        <button class="btn-add mais-vendidos-btn-add"
+                            <?php if ($deveAbrirModal): ?>
+                            data-toggle="modal" data-target="#item-<?= $item['item_id']; ?>"
+                            <?php endif; ?>
+                            data-estoque="<?= intval($item['item_estoque']); ?>"
+                            data-id="<?= $item['item_id']; ?>"
+                            data-nome="<?= htmlspecialchars($item['item_nome']); ?>"
+                            data-obs="<?= htmlspecialchars(strip_tags($item['item_obs'] ?? '')); ?>"
+                            data-categoria="<?= $item['categoria_id']; ?>"
+                            data-categoria-nome="<?= htmlspecialchars($item['categoria']); ?>"
+                            data-preco="<?= $item['item_preco']; ?>"
+                            data-cod="<?= $item['item_codigo']; ?>"
+                            data-tem-opcoes="<?= $deveAbrirModal ? '1' : '0'; ?>"
+                            title="adicionar à sacola">
+                            Adicionar
+                        </button>
+                    <?php else: ?>
+                        <button class="btn-add" style="background: #ccc; cursor: not-allowed; opacity: 0.6;" disabled>
+                            Indisponível
+                        </button>
+                    <?php endif; ?>
+                </div>
+            </article>
+        <?php } ?>
+    </div>
+
+    <script>
+    // Intercepta clique nos botões "Adicionar" dos mais vendidos
+    $(document).on('click', '.mais-vendidos-btn-add', function(e) {
+        var $btn = $(this);
+        var temOpcoes = $btn.data('tem-opcoes') == '1';
+        
+        // Se TEM opções, adiciona ao carrinho ANTES do modal abrir
+        if (temOpcoes) {
+            var itemId = $btn.data('id');
+            var itemNome = $btn.data('nome');
+            var itemObs = $btn.data('obs') || '';
+            var itemCategoria = $btn.data('categoria');
+            var categoriaNome = $btn.data('categoria-nome');
+            var itemPreco = parseFloat($btn.data('preco'));
+            var itemEstoque = parseInt($btn.data('estoque'));
+            var itemCod = $btn.data('cod');
+            
+            // Adiciona ao carrinho SEM extras (só o produto base TEMPORÁRIO)
+            var dados = {
+                item_id: itemId,
+                item_estoque: itemEstoque,
+                item_codigo: itemCod,
+                item_nome: itemNome,
+                categoria_nome: categoriaNome,
+                categoria_id: itemCategoria,
+                item_obs: itemObs,
+                item_preco: itemPreco,
+                extra: '',
+                desc: '',
+                extra_vals: '',
+                extra_preco: 0,
+                total: itemPreco,
+                temp_preview: 1 // Marca como temporário para ser substituído
+            };
+            
+            // Adiciona ao carrinho
+            var urlAdd = baseUri + "/carrinho/add/";
+            $.post(urlAdd, dados, function() {
+                // Recarrega o carrinho lateral
+                if (typeof rebind_reload === 'function') {
+                    rebind_reload();
+                }
+            });
+            
+            // Deixa o Bootstrap abrir o modal normalmente
+            return true;
+        }
+        
+        // Se NÃO tem opções, adiciona direto ao carrinho SEM abrir modal
+        if (!temOpcoes) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            var itemId = $btn.data('id');
+            var itemNome = $btn.data('nome');
+            var itemObs = $btn.data('obs') || '';
+            var itemCategoria = $btn.data('categoria');
+            var categoriaNome = $btn.data('categoria-nome');
+            var itemPreco = parseFloat($btn.data('preco'));
+            var itemEstoque = parseInt($btn.data('estoque'));
+            var itemCod = $btn.data('cod');
+
+            // Desabilita botão temporariamente
+            $btn.prop('disabled', true);
+            
+            // Verifica estoque
+            var urlCheck = baseUri + "/carrinho/add_more/";
+            $.post(urlCheck, { id: itemId, hash: '', estoque: itemEstoque }, function(rs) {
+                if (rs == '-1') {
+                    alert('Quantidade indisponível!');
+                    $btn.prop('disabled', false);
+                    return false;
+                }
+                
+                // Prepara dados do item (sem extras/opções)
+                var dados = {
+                    item_id: itemId,
+                    item_estoque: itemEstoque,
+                    item_codigo: itemCod,
+                    item_nome: itemNome,
+                    categoria_nome: categoriaNome,
+                    categoria_id: itemCategoria,
+                    item_obs: itemObs,
+                    item_preco: itemPreco,
+                    extra: '', // Sem extras
+                    desc: '',  // Sem descrição adicional
+                    extra_vals: '',
+                    extra_preco: 0,
+                    total: itemPreco
+                };
+                
+                // Adiciona ao carrinho
+                var urlAdd = baseUri + "/carrinho/add/";
+                $.post(urlAdd, dados, function() {}).done(function() {
+                    
+                    // Recarrega o carrinho
+                    if (typeof rebind_reload === 'function') {
+                        rebind_reload();
+                    }
+                    
+                    // Feedback visual no botão
+                    $btn.text('✓ Adicionado!');
+                    $btn.addClass('btn-success');
+                    
+                    // Toca som (se existir)
+                    if (typeof sound === 'function') {
+                        sound();
+                    }
+                    
+                    // Abre o modal do carrinho após 300ms
+                    setTimeout(function() {
+                        $('#modal-carrinho').modal('show');
+                    }, 300);
+                    
+                    // Reseta botão após 1.5s
+                    setTimeout(function() {
+                        $btn.text('Adicionar');
+                        $btn.removeClass('btn-success');
+                        $btn.prop('disabled', false);
+                    }, 1500);
+                    
+                }).fail(function() {
+                    alert('Erro ao adicionar item. Tente novamente.');
+                    $btn.prop('disabled', false);
+                });
+            });
+            
+            return false;
+        }
+        
+        // Se TEM opções, deixa abrir o modal normalmente
+    });
+    
+    // Initialize Slick Carousel for Mais Pedidos
+    (function() {
+        'use strict';
+        
+        function initMaisVendidosCarousel() {
+            const carousel = document.getElementById('topSold');
+            
+            if (!carousel || carousel.children.length === 0) {
+                return;
+            }
+            
+            // Check if Slick is available
+            if (typeof $ === 'undefined' || typeof $.fn.slick === 'undefined') {
+                console.error('[MAIS_VENDIDOS] Slick or jQuery not loaded!');
+                return;
+            }
+            
+            try {
+                $(carousel).slick({
+                    slidesToShow: 2,
+                    slidesToScroll: 2,
+                    infinite: true,
+                    autoplay: true,
+                    autoplaySpeed: 3000,
+                    arrows: false,
+                    dots: false,
+                    pauseOnHover: true,
+                    pauseOnFocus: false,
+                    adaptiveHeight: true,
+                    mobileFirst: true,
+                    variableWidth: false,
+                    centerMode: false,
+                    responsive: [
+                        {
+                            breakpoint: 600,
+                            settings: {
+                                slidesToShow: 2,
+                                slidesToScroll: 2
+                            }
+                        },
+                        {
+                            breakpoint: 900,
+                            settings: {
+                                slidesToShow: 3,
+                                slidesToScroll: 3
+                            }
+                        },
+                        {
+                            breakpoint: 1200,
+                            settings: {
+                                slidesToShow: 4,
+                                slidesToScroll: 4
+                            }
+                        }
+                    ]
+                });
+            } catch (error) {
+                console.error('[MAIS_VENDIDOS] ❌ Slick init error:', error);
+            }
+        }
+        
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(initMaisVendidosCarousel, 100);
+            });
+        } else {
+            setTimeout(initMaisVendidosCarousel, 100);
+        }
+    })();
+    </script>
+    </div>
+    <!-- End mais-vendidos-section -->
+
+    <?php 
+    // Mostra modal para todos os produtos que têm opções (com ou sem estoque)
+    foreach ($data['maisVendidos'] as $item) {
+        // Só cria modal se o produto tiver opções
+        if (!isset($item['opcoes'][0]) || count($item['opcoes']) === 0) {
+            continue;
+        }
+        
+        $opcoes = $item['opcoes'];
+        $meia = 0; // Mais vendidos não usam sistema de sabores
+        $iterator = 0;
+        $itemAll = []; // Não há itemAll para mais vendidos
+        
+        // Inclui o componente modal reutilizável
+        require 'modal-produto.php';
+    }
+}

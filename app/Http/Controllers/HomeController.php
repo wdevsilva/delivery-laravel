@@ -2,40 +2,34 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Config;
-use App\Models\Item;
-use App\Models\Categoria;
+use App\Repositories\ConfigRepository;
+use App\Repositories\CategoriaRepository;
+use App\Repositories\ItemRepository;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
+    protected $configRepository;
+    protected $categoriaRepository;
+    protected $itemRepository;
+
+    public function __construct(
+        ConfigRepository $configRepository,
+        CategoriaRepository $categoriaRepository,
+        ItemRepository $itemRepository
+    ) {
+        $this->configRepository = $configRepository;
+        $this->categoriaRepository = $categoriaRepository;
+        $this->itemRepository = $itemRepository;
+    }
+
     public function index()
     {
-        // Config da loja
-        $config = Config::first();
+        $config = $this->configRepository->getPrimeira();
+        $categorias = $this->categoriaRepository->getAtivas();
+        $maisVendidos = $this->itemRepository->produtosMaisVendidos();
+        $promocoes = collect($maisVendidos)->where('item_promo', 1)->take(10);
 
-        // Produtos mais pedidos (Mais Vendidos)
-        $maisPedidos = Item::ativo()
-            ->orderBy('item_id', 'desc')
-            ->take(4)
-            ->get();
-
-        // Produtos em promoção
-        $promocoes = Item::ativo()
-            ->promocao()
-            ->take(4)
-            ->get();
-
-        // Categorias ativas
-        $categorias = Categoria::ativa()
-            ->orderBy('categoria_ordem')
-            ->get();
-
-        return view('home.cardapio', compact(
-            'config',
-            'maisPedidos',
-            'promocoes',
-            'categorias'
-        ));
+        return view('site.index', compact('config', 'categorias', 'maisVendidos', 'promocoes'));
     }
 }
