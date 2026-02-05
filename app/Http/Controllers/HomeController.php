@@ -25,7 +25,7 @@ class HomeController extends Controller
 
     public function index()
     {
-        $config = $this->configRepository->getPrimeira();
+        $config = $this->configRepository->getConfig();
         $categorias = $this->categoriaRepository->getAtivas();
         $maisVendidos = $this->itemRepository->produtosMaisVendidos();
         $promocoes = collect($maisVendidos)->where('item_promo', 1)->take(10);

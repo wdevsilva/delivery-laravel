@@ -585,11 +585,6 @@
                     var urlAdd = baseUri + "/carrinho/add/";
                     $.post(urlAdd, dados, function() {}).done(function() {
 
-                        // Recarrega o carrinho
-                        if (typeof rebind_reload === 'function') {
-                            rebind_reload();
-                        }
-
                         // Feedback visual no botão
                         var $btnComprar = $btn.find('.btn-comprar');
                         if ($btnComprar.length) {
@@ -601,10 +596,15 @@
                             sound();
                         }
 
+                        // Recarrega o carrinho
+                        if (typeof rebind_reload === 'function') {
+                            rebind_reload();
+                        }
+
                         // Abre modal do carrinho
                         setTimeout(function() {
                             $('#modal-carrinho').modal('show');
-                        }, 300);
+                        }, 800);
 
                         // Reseta botão
                         setTimeout(function() {
@@ -654,7 +654,7 @@
                 // Aguarda um momento para garantir que tudo foi carregado
                 setTimeout(function() {
                     var $firstModal = $('.box170[data-toggle="modal"]').first();
-                    if ($firstModal.length) {
+                    if ($firstModal.leng                                                                                                th) {
                         var targetModal = $firstModal.attr('data-target');
                         if (targetModal) {
                             $(targetModal).modal('show');
