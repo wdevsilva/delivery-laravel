@@ -173,7 +173,7 @@
     </div>
     <div data-v-5734e810="" data-v-56e5d68e="" class="navigation-header flex items-center justify-between navigation-header--floating-bg bg-white">
         <div data-v-5734e810="" class="flex items-center">
-            <a href="#" id="back-link" class="navigation-header__back navigation-header__back--floating-bg">
+            <a href="{{ route('home') }}" id="back-link" class="navigation-header__back navigation-header__back--floating-bg">
                 <div data-v-d15b4698="" data-v-5734e810="" class="icon-container navigation-header__back__icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left voltar">
                         <polyline points="15 18 9 12 15 6"></polyline>

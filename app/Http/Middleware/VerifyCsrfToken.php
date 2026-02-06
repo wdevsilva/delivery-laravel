@@ -14,8 +14,8 @@ class VerifyCsrfToken extends BaseVerifier
     protected $except = [
         'carrinho/*',
         'carrinho/reload',
-        'carrinho/get_count_js',
-        'carrinho/get_count_bag',
-        'carrinho/dispensar_bebidas',
+        'carrinho/getCountJs',
+        'carrinho/getCountBag',
+        'carrinho/dispensarBebidas',
     ];
 }

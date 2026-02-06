@@ -123,4 +123,15 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Assets Version
+    |--------------------------------------------------------------------------
+    |
+    | Versão dos assets (JS/CSS) para cache busting
+    |
+    */
+
+    'assets_version' => '1.0.2',
+
 ];

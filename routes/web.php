@@ -17,6 +17,7 @@ use App\Http\Controllers\Mesa\GarconController;
 
 // Home
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/index', [HomeController::class, 'index'])->name('home.index');
 
 // Manifest PWA
 Route::get('/generate-manifest.php', function() {
@@ -54,6 +55,7 @@ Route::get('/categoria/{id}', [App\Http\Controllers\CategoriaController::class, 
 Route::prefix('carrinho')->group(function () {
     Route::get('/', [CarrinhoController::class, 'index'])->name('carrinho.index');
     Route::post('/adicionar', [CarrinhoController::class, 'adicionar'])->name('carrinho.adicionar');
+    Route::post('/add', [CarrinhoController::class, 'adicionar']);
     Route::post('/remover', [CarrinhoController::class, 'remover'])->name('carrinho.remover');
     Route::post('/atualizar', [CarrinhoController::class, 'atualizar'])->name('carrinho.atualizar');
     Route::get('/checkout', [CarrinhoController::class, 'checkout'])->name('carrinho.checkout');
@@ -61,9 +63,12 @@ Route::prefix('carrinho')->group(function () {
 
     // Rotas AJAX para atualização do carrinho
     Route::match(['GET', 'POST'], '/reload', [CarrinhoController::class, 'reload']);
-    Route::post('/get_count_js', [CarrinhoController::class, 'getCountJs']);
-    Route::post('/get_count_bag', [CarrinhoController::class, 'getCountBag']);
+    Route::match(['GET', 'POST'], '/get_count_js', [CarrinhoController::class, 'getCountJs']);
+    Route::match(['GET', 'POST'], '/get_count_bag', [CarrinhoController::class, 'getCountBag']);
     Route::post('/dispensar_bebidas', [CarrinhoController::class, 'dispensarBebidas']);
+    Route::post('/add_more', [CarrinhoController::class, 'addMore']);
+    Route::post('/del_more', [CarrinhoController::class, 'delMore']);
+    Route::post('/del', [CarrinhoController::class, 'del']);
 });
 
 // Cupons

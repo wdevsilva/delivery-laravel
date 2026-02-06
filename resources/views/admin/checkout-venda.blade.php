@@ -192,7 +192,7 @@
                                         <select class="form-control" name="pedido_local" id="pedido_local">
                                             <option value="" data-cep="" data-bairro="" selected>Selecione uma opção...</option>
                                             <?php if ($data['config']->config_retirada == 1) : ?>
-                                                <option value="0" data-cep="0">Retirar no Local</option>                                                
+                                                <option value="0" data-cep="0">Retirar no Local</option>
                                             <?php endif; ?>
                                             <?php foreach ($data['endereco'] as $end) : ?>
                                                 <option value="<?= $end->endereco_id ?>" data-bairro="<?= $end->endereco_bairro_id ?>" data-cep="<?= $end->endereco_cep ?>" data-tempo="<?= $end->bairro_tempo ?>">
@@ -378,7 +378,7 @@
     <script>
         rebind_reload();
 
-        
+
     </script>
 </body>
 

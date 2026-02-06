@@ -9,7 +9,7 @@ class ProdutoRepository
 
     public function produtosMaisVendidos()
     {
-        $query = DB::query("
+        $results = DB::select("
             -- CTE para média de vendas
             WITH vendas_por_item AS (
                 SELECT
@@ -72,14 +72,17 @@ class ProdutoRepository
             AND i.item_ativo = 1
             AND c.categoria_ativa = 1
             ORDER BY RAND()
-            LIMIT 20;
+            LIMIT 20
         ");
 
-        $dados = $query->fetch();
+        $dados = array_map(function($item) {
+            return (array) $item;
+        }, $results);
 
         $cat_item = [];
         $k = 0;
         foreach ($dados as $cat) {
+            $cat = (object) $cat;
             $itensAll = self::get_by_categoria($cat->categoria_id);
             $itens = self::get_by_categoria($cat->categoria_id, 1000);
             $opcoes = self::get_opcoes_by_categoria($cat->categoria_id);
@@ -98,8 +101,8 @@ class ProdutoRepository
                 $cat_item[$k]['categoria_id'] = $cat->categoria_id;
                 $cat_item[$k]['categoria_meia'] = $cat->categoria_meia;
                 $cat_item[$k]['categoria_img'] = $cat->categoria_img;
-                $cat_item[$k]['item'] = $itens;
-                $cat_item[$k]['itemAll'] = $itensAll;
+                $cat_item[$k]['item'] = $itens->toArray();
+                $cat_item[$k]['itemAll'] = $itensAll->toArray();
                 $cat_item[$k]['opcoes'] = $opcoes;
                 $k++;
             }

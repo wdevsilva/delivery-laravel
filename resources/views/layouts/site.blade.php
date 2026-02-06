@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <title>{{ $config->config_nome ?? 'Delivery System' }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="application-name" content="{{ $config->config_nome ?? '' }}" />
     <meta name="description" content="{{ $config->config_site_description ?? '' }}" />
     <meta name="keywords" content="{{ $config->config_site_keywords ?? '' }}" />

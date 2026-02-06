@@ -92,4 +92,30 @@ class ItemRepository
             ORDER BY o.opcao_ordem
         ", [$itemId]);
     }
+
+    public function getByCategoria($id, $limit = 100000)
+    {
+        return DB::table('item')
+            ->select(
+                'item.item_id',
+                'item.item_categoria',
+                'item.item_nome',
+                'item.item_obs',
+                'item.item_desc',
+                'item.item_foto',
+                'item.item_preco',
+                'item.item_codigo',
+                'item.item_estoque',
+                'categoria.categoria_nome',
+                'categoria.categoria_id',
+                'categoria.categoria_meia'
+            )
+            ->join('categoria', 'categoria.categoria_id', '=', 'item.item_categoria')
+            ->where('item.item_id', '>=', 1)
+            ->where('item.item_ativo', '=', 1)
+            ->where('item.item_categoria', '=', $id)
+            ->orderBy('item.item_nome', 'ASC')
+            ->limit($limit)
+            ->get();
+    }
 }

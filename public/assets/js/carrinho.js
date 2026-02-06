@@ -1,4 +1,11 @@
 $(function() {
+    // Configurar CSRF token para AJAX
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    }); 
+
     sabores = 1;
     categoria = '';
     valorAcrescimento = 0;
@@ -11,12 +18,12 @@ $(function() {
         var $input = $(this);
         var nome = $input.data('nome');
         var isChecked = $input.is(':checked');
-        
-        
+
+
         // Detecta se é uma borda (não está em .lista-sabores)
         var isBorda = $input.closest('.lista-sabores').length === 0;
-        
-        
+
+
         if (isBorda) {
             if (isChecked) {
                 // Adiciona à lista se marcado
@@ -104,17 +111,17 @@ $(function() {
             // Previne execução múltipla
             e.preventDefault();
             e.stopPropagation();
-            
+
             var $btn = $(this);
-            
+
             // Se já está processando, ignora
             if ($btn.data('processing')) {
                 return false;
             }
-            
+
             // Processa imediatamente
             processarAdicaoCarrinho($btn);
-            
+
             return false;
         });
     });
@@ -123,7 +130,7 @@ $(function() {
 function processarAdicaoCarrinho($btn) {
     var item_id = $btn.data("id");
     var $modal = $("#item-" + item_id);
-    
+
     // ============ INTERCEPTOR PARA ADICIONAR ITENS AO PEDIDO (Admin) ============
     if (window.adicionandoItensPedido === true && typeof adicionarItemAoPedido === 'function') {
         // Estamos no contexto do modal de adicionar itens ao pedido
@@ -134,21 +141,21 @@ function processarAdicaoCarrinho($btn) {
         var categoria_nome = $btn.data("categoria-nome");
         var item_codigo = $btn.data("cod") || '';
         var item_obs = $btn.data("obs") || '';
-        
+
         // Adiciona à lista de itens selecionados
         adicionarItemAoPedido(item_id, item_nome, item_preco, item_estoque, categoria_id, categoria_nome, item_codigo, item_obs);
-        
+
         // Fecha o modal de produto
         $modal.modal('hide');
-        
+
         return; // Para aqui, não adiciona ao carrinho
     }
     // ============================================================================
-        
+
         // NOVA ABORDAGEM: Usa selectedItems do modal-produto.js ao invés de buscar inputs:checked
         // Porque os adicionais estão em selectedItems mas os checkboxes podem não estar marcados
         var capturedOptions = [];
-        
+
         // Itera sobre selectedItems para capturar os adicionais
         if (window.selectedItems && typeof window.selectedItems === 'object') {
             $.each(window.selectedItems, function(key, item) {
@@ -156,7 +163,7 @@ function processarAdicaoCarrinho($btn) {
                 if (key === 'produto-principal' || key.startsWith('sab-')) {
                     return; // continue
                 }
-                
+
                 // Este é um adicional!
                 capturedOptions.push({
                     input: item.element,
@@ -167,7 +174,7 @@ function processarAdicaoCarrinho($btn) {
                 });
             });
         }
-        
+
         // FALLBACK: Se não tiver nada em selectedItems, busca inputs checked diretamente
         if (capturedOptions.length === 0) {
             $modal.find('input[type="checkbox"]:checked, input[type="radio"]:checked').each(function() {
@@ -176,7 +183,7 @@ function processarAdicaoCarrinho($btn) {
                 if ($input.closest('.lista-sabores').length > 0) {
                     return;
                 }
-                
+
                 capturedOptions.push({
                     input: this,
                     nome: $input.data('nome') || '',
@@ -186,7 +193,7 @@ function processarAdicaoCarrinho($btn) {
                 });
             });
         }
-        
+
         // ================================================================
 
         var item_hash = $btn.data("hash");
@@ -211,32 +218,32 @@ function processarAdicaoCarrinho($btn) {
         var optExtraValTotal = 0;
         var optExtraNames = "";
         var optExtraVals = "";
-        
+
         // ===== USA OS DADOS CAPTURADOS (capturedOptions) =====
-        
+
         var optElm = capturedOptions; // Usa array capturado em vez de buscar novamente
-        
+
         // ===== VALIDAÇÃO DE GRUPOS OBRIGATÓRIOS =====
         // SÓ VALIDA SE O MODAL EXISTIR E ESTIVER VISÍVEL
         var $modal = $("#item-" + item_id);
-        
+
         // Se o modal não existe ou não está visível, pula a validação (ex: Mais Vendidos sem opções)
         if ($modal.length === 0 || (!$modal.hasClass('in') && !$modal.is(':visible'))) {
             // Não há modal ou não está aberto, continua sem validação
         } else {
             // Modal existe e está aberto, verifica se há grupos obrigatórios
             var gruposObrigatorios = [];
-            
+
             // Identifica os grupos obrigatórios pelos inputs com required
             $modal.find('input[required]').each(function() {
                 var grupoId = $(this).data('grupo');
                 var grupoName = $(this).attr('name');
-                
+
                 // Adiciona apenas uma vez cada grupo
                 if (grupoId && !gruposObrigatorios.some(g => g.id === grupoId)) {
                     var $grupoSection = $(this).closest('.opcoes-section');
                     var grupoNome = $grupoSection.find('.opcoes-section-title span').first().text().trim();
-                    
+
                     gruposObrigatorios.push({
                         id: grupoId,
                         nome: grupoNome,
@@ -244,26 +251,26 @@ function processarAdicaoCarrinho($btn) {
                     });
                 }
             });
-            
+
             // SÓ FAZ VALIDAÇÃO SE HOUVER GRUPOS OBRIGATÓRIOS
             if (gruposObrigatorios.length > 0) {
                 // Valida se cada grupo obrigatório tem pelo menos uma opção selecionada
                 var gruposNaoSelecionados = [];
-                
+
                 for (var i = 0; i < gruposObrigatorios.length; i++) {
                     var grupo = gruposObrigatorios[i];
-                    
+
                     // Busca inputs do grupo usando o padrão name="opt-{grupo_id}-{item_id}"
                     // name="opt-123-456" onde 123 é o grupo_id e 456 é o item_id
                     var selectorName = 'input[name="opt-' + grupo.id + '-' + item_id + '"]';
-                    
+
                     // Aguarda 10ms para garantir que o DOM está atualizado
                     var inputsSelecionados = $modal.find(selectorName).filter(function() {
                         return $(this).is(':checked') || $(this).prop('checked');
                     });
-                    
+
                     var selecionado = inputsSelecionados.length > 0;
-            
+
                     // Verifica também se o card está com classe 'selected'
                     if (!selecionado) {
                         var $grupoCards = $modal.find('.grupo-' + grupo.id);
@@ -272,12 +279,12 @@ function processarAdicaoCarrinho($btn) {
                             selecionado = true;
                         }
                     }
-                    
+
                     if (!selecionado) {
                         gruposNaoSelecionados.push(grupo.nome);
                     }
                 }
-                
+
                 // Se houver grupos obrigatórios não selecionados, exibe mensagem e bloqueia
                 if (gruposNaoSelecionados.length > 0) {
                     // Destaca visualmente os grupos não selecionados
@@ -286,17 +293,17 @@ function processarAdicaoCarrinho($btn) {
                             var titulo = $(this).find('.opcoes-section-title span').first().text().trim();
                             if (titulo === nomeGrupo) {
                                 var $section = $(this);
-                                
+
                                 // Adiciona classe de erro
                                 $section.addClass('opcoes-section-error');
-                                
+
                                 // Faz scroll suave até a primeira seção com erro
                                 if ($modal.find('.opcoes-section-error').first().is($section)) {
                                     $modal.find('.modal-body').animate({
                                         scrollTop: $section.position().top - 20
                                     }, 400);
                                 }
-                                
+
                                 // Remove destaque após 2 segundos
                                 setTimeout(function() {
                                     $section.removeClass('opcoes-section-error');
@@ -304,19 +311,19 @@ function processarAdicaoCarrinho($btn) {
                             }
                         });
                     });
-                    
+
                     // Vibra o botão para feedback tátil visual
                     var $btnAdd = $("#btn-add-" + item_id);
                     $btnAdd.addClass('btn-shake');
                     setTimeout(function() {
                         $btnAdd.removeClass('btn-shake');
                     }, 500);
-                    
+
                     return false;
                 }
             } // Fecha o if (gruposObrigatorios.length > 0)
         } // Fecha o else da validação
-        
+
         var sabElm = $(".lista-sab-" + item_id).filter(':visible').find("input:checked");
 
         // Processa sabores se houver pelo menos 1 selecionado
@@ -332,7 +339,7 @@ function processarAdicaoCarrinho($btn) {
                 valMinMax += preco;
                 valMinMaxQtde++;
                 item_preco = preco;
-                
+
                 // Para 1 sabor, substitui o item_nome pelo nome do sabor
                 if (sabElm.length === 1) {
                     item_nome = nome;
@@ -343,7 +350,7 @@ function processarAdicaoCarrinho($btn) {
 
                 maior_valor.push(preco);
             });
-            
+
             // Para múltiplos sabores, fecha a lista de sabores com quebra de linha
             if (sabElm.length > 1) {
                 optExtraNames = optExtraNames.replace(/,\s*$/, '') + '<br>';
@@ -359,17 +366,17 @@ function processarAdicaoCarrinho($btn) {
 
         }
         $("#btn-add-" + item_id).removeAttr("disabled");
-        
+
         // Group options by grupo_nome
         if (optElm.length >= 1) {
             var grupos = {};
-            
+
             // Itera sobre o array de opções capturadas
             for (var i = 0; i < optElm.length; i++) {
                 var opt = optElm[i];
                 var $input = $(opt.input);
                 var grupoNome = '';
-                
+
                 // Tenta encontrar o nome do grupo
                 // 1. Primeiro procura em .opcao-card (layout novo com cards)
                 var $opcaoCard = $input.closest('.opcao-card');
@@ -378,7 +385,7 @@ function processarAdicaoCarrinho($btn) {
                     var $section = $opcaoCard.closest('.opcoes-section');
                     grupoNome = $section.find('.opcoes-section-title span').first().text().trim();
                 }
-                
+
                 // 2. Se não encontrou, procura em .form-check (layout antigo)
                 if (!grupoNome) {
                     var $formCheck = $input.closest('.form-check');
@@ -386,37 +393,37 @@ function processarAdicaoCarrinho($btn) {
                         grupoNome = $formCheck.parent().find('b').first().text().trim();
                     }
                 }
-                
+
                 // 3. Se ainda não encontrou, usa o data-grupo ou 'OUTROS'
                 if (!grupoNome) {
                     grupoNome = opt.grupo || 'OUTROS';
                 }
-                
-                
+
+
                 if (!grupos[grupoNome]) {
                     grupos[grupoNome] = [];
                 }
-                
+
                 grupos[grupoNome].push({
                     nome: opt.nome,
                     preco: parseFloat(opt.preco) || 0
                 });
-                
+
                 var precoParseado = parseFloat(opt.preco) || 0;
-                
+
                 optExtraVals += precoParseado + ", ";
                 optExtraValTotal += precoParseado;
             }
-            
+
             // Format output with group labels and line breaks
             var groupLines = [];
-            
+
             for (var grupo in grupos) {
                 if (grupos.hasOwnProperty(grupo)) {
                     var line = '';
                     var itensComPreco = [];
                     var itensSemPreco = [];
-                    
+
                     // Separa itens com e sem preço
                     grupos[grupo].forEach(function(item) {
                         var preco = parseFloat(item.preco) || 0;
@@ -426,10 +433,10 @@ function processarAdicaoCarrinho($btn) {
                             itensSemPreco.push(item.nome);
                         }
                     });
-                    
+
                     // Apenas mostra grupos que tenham itens COM preço OU que não sejam ADICIONAIS
                     var mostrarGrupo = false;
-                    
+
                     if (grupo === 'ADICIONAL' || grupo === 'ADICIONAIS') {
                         // Para ADICIONAIS, só mostra se tiver itens com preço
                         if (itensComPreco.length > 0) {
@@ -445,18 +452,18 @@ function processarAdicaoCarrinho($btn) {
                         } else {
                             line = "<b>" + grupo + ":</b> ";
                         }
-                        
+
                         var todosItens = itensComPreco.concat(itensSemPreco);
                         line += todosItens.join(", ");
                         mostrarGrupo = true;
                     }
-                    
+
                     if (mostrarGrupo) {
                         groupLines.push(line);
                     }
                 }
             }
-            
+
             // Join with <br> for line breaks
             if (groupLines.length > 0) {
                 optExtraNames += groupLines.join('<br>') + ', ';
@@ -486,13 +493,13 @@ function processarAdicaoCarrinho($btn) {
         // NOVO: Para sabor único (meia = 1), envia flag para remover item anterior da mesma categoria
         var $modal = $("#item-" + item_id);
         var maxSabores = parseInt($('#sabores-' + item_id).val()) || 1;
-        
+
         if (maxSabores === 1 && sabElm.length === 1) {
             dados.is_single_flavor = 1;
         }
 
         var url = baseUri + "/carrinho/add/";
-        
+
         // Aguarda o POST concluir ANTES de fechar o modal e limpar seleções
         $.post(url, dados, function() {}).done(function() {
             // Sucesso - agora pode fechar o modal
@@ -502,13 +509,13 @@ function processarAdicaoCarrinho($btn) {
             $(".lista-sabores").find("input:checked").removeAttr("checked");
             $(".form-check").find("input:checked").removeAttr("checked");
             $(".pre-checked").parent().trigger("click");
-            
+
             // Limpa memória de bordas
             window.selectedBordas = [];
-            
+
             // Recarrega o carrinho
             rebind_reload();
-            
+
             // Mostra o carrinho e toca som
             setTimeout(function() {
                 $("#modal-carrinho").modal("show");
@@ -548,21 +555,21 @@ $(document).ready(function() {
 
     $(".modal-itens").on("hide.bs.modal", function() {
         saboresSelect = 1;
-        
+
         // Limpa sabores
         $(".lista-sabores").find("input").removeAttr("disabled");
         $(".lista-sabores").find("input").prop("checked", false);
         $(".lista-sabores").slideDown(300); // Mostra todos os sabores novamente
-        
+
         // Limpa opções (adicionais, bordas, etc.)
         $(".form-check").find("input").removeAttr("disabled");
         $(".form-check").find("input").prop("checked", false);
         $(".opcao-card input").prop("checked", false);
         $(".opcao-card").removeClass("selected");
-        
+
         // Limpa classes visuais
         $(".lista-sabores label").removeClass("selected");
-        
+
         // Reseta acréscimo
         $('.acrescimoMédia').html('');
     });
@@ -651,34 +658,34 @@ $("#pedido_local").on("change", function() {
     taxa = 0;
     $("#pedido_entrega").val(0);
     $("#taxa-faixa").html("R$ 0,00");
-    
+
     if (local == -1) {
         window.location.href = baseUri + "/novo-endereco/?return=pedido";
     }
-    
+
     // ✅ RETIRAR NO LOCAL: pode ser -2 ou 0 dependendo do contexto
     if (local == -2 || local == 0) {
         // ✅ RECALCULAR TAXA DO CARTÃO quando selecionar "Retirar no Local" (taxa de entrega = 0)
         taxa = 0;
         $("#pedido_entrega").val(0);
         $("#taxa-faixa").html("R$ 0,00");
-        
+
         // ✅ Calcular desconto de fidelidade
         var descontoFidelidade = 0;
         if (typeof temDescontoFidelidade !== 'undefined' && temDescontoFidelidade === true) {
             descontoFidelidade = parseFloat(totalCompra) * (percentualDescontoFidelidade / 100);
             descontoFidelidade = Math.round((descontoFidelidade + Number.EPSILON) * 100) / 100;
         }
-        
+
         // Verificar forma de pagamento
         var formaPagamento = $("#forma-pagamento").val();
         console.log('[DEBUG RETIRAR LOCAL] Forma pagamento:', formaPagamento, 'Taxa atual:', taxa);
-        
+
         // Se tinha cartão selecionado, recalcular com taxa de entrega = 0
         if (formaPagamento == 2 || formaPagamento == 3) {
             console.log('[DEBUG] Recalculando com atualizarTotal...');
             atualizarTotal(totalCompra);
-            
+
             // Atualizar o total geral COM taxa de cartão E desconto de fidelidade
             var taxaCartaoAtualizada = parseFloat($("#taxa-cartao").val()) || 0;
             console.log('[DEBUG] Taxa cartão após atualizarTotal:', taxaCartaoAtualizada);
@@ -693,7 +700,7 @@ $("#pedido_local").on("change", function() {
             $("#pedido_total").val(novoTotal.toFixed(2));
             $("#pedido-total").html(novoTotal.formatMoney());
         }
-        
+
         if (local == -2) {
             $("#forma-pagamento-troco-bandeira").addClass("hide").hide();
             $("#btn-pedido-concluir").removeAttr("disabled");
@@ -706,7 +713,7 @@ $("#pedido_local").on("change", function() {
         if (typeof temDescontoFidelidade !== 'undefined' && temDescontoFidelidade === true) {
             descontoFidelidade = parseFloat(totalCompra) * (percentualDescontoFidelidade / 100);
             descontoFidelidade = Math.round((descontoFidelidade + Number.EPSILON) * 100) / 100;
-            
+
             // Atualizar display do desconto
             if ($('#desconto-fidelidade-valor').length) {
                 $('#desconto-fidelidade-valor').html('- R$ ' + descontoFidelidade.toFixed(2).replace('.', ','));
@@ -716,7 +723,7 @@ $("#pedido_local").on("change", function() {
                 $('#pedido_desconto_fidelidade').val(descontoFidelidade.toFixed(2));
             }
         }
-        
+
         // Para outros casos (novo endereço, voltar para "Selecione uma opção..."), aplicar desconto ao total
         var novoTotal = parseFloat(totalCompra) - descontoFidelidade;
         $("#pedido_total").val(novoTotal.toFixed(2));
@@ -739,14 +746,14 @@ $("#pedido_local").on("change", function() {
                     taxa = parseFloat(rs);
                     $("#pedido_entrega").val(taxa);
                 }
-                
+
                 // ✅ Calcular desconto de fidelidade SEMPRE sobre o totalCompra original
                 var descontoFidelidade = 0;
                 if (typeof temDescontoFidelidade !== 'undefined' && temDescontoFidelidade === true) {
                     // Usar totalCompra (que é o subtotal dos produtos, sem taxa de entrega)
                     descontoFidelidade = parseFloat(totalCompra) * (percentualDescontoFidelidade / 100);
                     descontoFidelidade = Math.round((descontoFidelidade + Number.EPSILON) * 100) / 100;
-                    
+
                     // Atualizar display do desconto
                     if ($('#desconto-fidelidade-valor').length) {
                         $('#desconto-fidelidade-valor').html('- R$ ' + descontoFidelidade.toFixed(2).replace('.', ','));
@@ -756,13 +763,13 @@ $("#pedido_local").on("change", function() {
                         $('#pedido_desconto_fidelidade').val(descontoFidelidade.toFixed(2));
                     }
                 }
-                
+
                 // ✅ RECALCULAR TAXA DO CARTÃO quando mudar o endereço (e consequentemente a taxa de entrega)
                 var formaPagamento = $("#forma-pagamento").val();
                 if (formaPagamento == 2 || formaPagamento == 3) {
                     // Se já tem forma de pagamento de cartão selecionada, recalcular
                     atualizarTotal(totalCompra);
-                    
+
                     // Atualizar o total geral após recalcular a taxa do cartão
                     var taxaCartaoAtualizada = parseFloat($("#taxa-cartao").val()) || 0;
                     var novoTotal = parseFloat(totalCompra) - descontoFidelidade + parseFloat(taxa) + taxaCartaoAtualizada;
@@ -775,11 +782,11 @@ $("#pedido_local").on("change", function() {
                     $("#pedido_entrega").val(taxa);
                     $("#pedido-total").html(total.formatMoney());
                 }
-                
+
                 $("#taxa-faixa").html(taxa.formatMoney());
             });
         }
-        
+
         $("#pega-endereco").val(local);
         $("#pega-endereco2").val(local);
         $("#forma-pagamento").removeAttr("disabled");
@@ -796,14 +803,14 @@ $("#pedido_local").on("change", function() {
         }
         $("#forma-pagamento").attr("disabled", "disabled");
         $("#taxa-faixa").html("R$ 0,00");
-        
+
         // ✅ Calcular desconto de fidelidade mesmo quando nenhum local está selecionado
         var descontoFidelidade = 0;
         if (typeof temDescontoFidelidade !== 'undefined' && temDescontoFidelidade === true) {
             descontoFidelidade = parseFloat(totalCompra) * (percentualDescontoFidelidade / 100);
             descontoFidelidade = Math.round((descontoFidelidade + Number.EPSILON) * 100) / 100;
         }
-        
+
         var totalComDesconto = parseFloat(totalCompra) - descontoFidelidade;
         $("#pedido_total").val(totalComDesconto.toFixed(2));
         $("#pedido-total").html(totalComDesconto.formatMoney());
@@ -856,7 +863,7 @@ $("#forma-pagamento").on("change", function() {
         // $(".cartaotx").show();
 
         atualizarTotal(totalCompra, faixasCartao);
-        
+
         // ✅ RECALCULAR TOTAL GERAL após calcular taxa do cartão
         var taxaCartaoAtualizada = parseFloat($("#taxa-cartao").val()) || 0;
         var descontoFidelidade = 0;
@@ -879,14 +886,14 @@ $("#forma-pagamento").on("change", function() {
         if ($("#taxa-cartao").val() != 0) {
             document.getElementById('pedido_taxa_cartao').value = '';
             $("#taxa-cartao").html("R$ 0,00");
-            
+
             // ✅ Calcular desconto de fidelidade
             var descontoFidelidade = 0;
             if (typeof temDescontoFidelidade !== 'undefined' && temDescontoFidelidade === true) {
                 descontoFidelidade = parseFloat(totalCompra) * (percentualDescontoFidelidade / 100);
                 descontoFidelidade = Math.round((descontoFidelidade + Number.EPSILON) * 100) / 100;
             }
-            
+
             total = parseFloat(totalCompra) - descontoFidelidade + parseFloat(taxa);
             $("#pedido_total").val(total);
             $("#pedido-total").html(total.formatMoney());
@@ -907,7 +914,7 @@ $("#forma-pagamento").on("change", function() {
 
         // ✅ REMOVER TAXA DE CARTÃO PARA TODAS AS EMPRESAS
         atualizarTotal(totalCompra);
-        
+
         // ✅ RECALCULAR TOTAL GERAL sem taxa de cartão
         var descontoFidelidade = 0;
         if (typeof temDescontoFidelidade !== 'undefined' && temDescontoFidelidade === true) {
@@ -917,7 +924,7 @@ $("#forma-pagamento").on("change", function() {
         var novoTotal = parseFloat(totalCompra) - descontoFidelidade + parseFloat(taxa);
         $("#pedido_total").val(novoTotal.toFixed(2));
         $("#pedido-total").html(novoTotal.formatMoney());
-        
+
         $(".cartaotx").hide();
 
         $("#troco-bandeira").attr("type", "tel");
@@ -965,10 +972,10 @@ function calcularTaxa(totalCompra) {
 }
 
 function atualizarTotal(totalCompra) {
-    
+
     let taxaCartao = 0;
     var forma = $("#forma-pagamento").val();
-    
+
     // ✅ SÓ CALCULA TAXA SE FOR CARTÃO (forma 2 = débito, forma 3 = crédito)
     if (forma == 2 || forma == 3) {
         if (configTaxaCartao.config_taxa_tipo === 'taxa_por_item') {
@@ -993,7 +1000,7 @@ function atualizarTotal(totalCompra) {
                         taxaCartao += taxaCategoria * quantidadeCategoria;
                     }
                 }
-                
+
                 // força arredondamento em 2 casas
                 taxaCartao = Math.round((taxaCartao + Number.EPSILON) * 100) / 100;
             }
@@ -1002,11 +1009,11 @@ function atualizarTotal(totalCompra) {
             taxaCartao = calcularTaxa(totalCompra, taxa);
         } else if (configTaxaCartao.config_taxa_tipo === 'percentual') {
             // converte JSON string para objeto
-            let formasPagamento = typeof configTaxaCartao.config_taxa_formas_pagamento === 'string' 
-                ? JSON.parse(configTaxaCartao.config_taxa_formas_pagamento) 
+            let formasPagamento = typeof configTaxaCartao.config_taxa_formas_pagamento === 'string'
+                ? JSON.parse(configTaxaCartao.config_taxa_formas_pagamento)
                 : configTaxaCartao.config_taxa_formas_pagamento;
 
-            if(formasPagamento){    
+            if(formasPagamento){
                 let percentual = formasPagamento[forma] || 0;
 
                 if (empresa == 'dgustsalgados') {
@@ -1038,30 +1045,30 @@ function atualizarTotal(totalCompra) {
     $("#taxa-cartao").html("R$ " + taxaCartao.toFixed(2));
     $("#taxa-cartao").val(taxaCartao);
     document.getElementById('pedido_taxa_cartao').value = taxaCartao;
-    
+
     // Mostrar/esconder taxa de cartão baseado no valor
     if (taxaCartao > 0) {
         $(".cartaotx").show();
     } else {
         $(".cartaotx").hide();
     }
-    
+
     // ===== DESCONTO DE FIDELIDADE: A cada X pedidos, ganhe Y% de desconto =====
     let descontoFidelidade = 0;
     if (typeof temDescontoFidelidade !== 'undefined' && temDescontoFidelidade === true) {
         // Buscar percentual configurado (se não existir, usar 10% como padrão)
         let percentualDesconto = typeof percentualDescontoFidelidade !== 'undefined' ? percentualDescontoFidelidade : 10;
-        
+
         // Aplicar desconto no subtotal (antes da taxa de entrega e cartão)
         descontoFidelidade = parseFloat(totalCompra) * (percentualDesconto / 100);
         descontoFidelidade = Math.round((descontoFidelidade + Number.EPSILON) * 100) / 100;
-        
+
         // Atualizar display do desconto
         if ($('#desconto-fidelidade-valor').length) {
             $('#desconto-fidelidade-valor').html('- R$ ' + descontoFidelidade.toFixed(2).replace('.', ','));
             $('.desconto-fidelidade-linha').show();
         }
-        
+
         // Guardar valor do desconto
         if ($('#pedido_desconto_fidelidade').length) {
             document.getElementById('pedido_desconto_fidelidade').value = descontoFidelidade;
@@ -1072,7 +1079,7 @@ function atualizarTotal(totalCompra) {
             $('.desconto-fidelidade-linha').hide();
         }
     }
-    
+
     // Calcular total final: subtotal - desconto fidelidade + taxa entrega + taxa cartão
     let total = parseFloat(totalCompra) - descontoFidelidade + parseFloat(taxa) + taxaCartao;
     $("#pedido_total").val(total);
@@ -1081,7 +1088,7 @@ function atualizarTotal(totalCompra) {
 
 function validaPagamento() {
     var start = performance.now();
-    
+
     var forma = $("#forma-pagamento").val();
     var troco_bandeira = $("#troco-bandeira").val();
     var pagto = "";
@@ -1236,21 +1243,21 @@ function addPedirNovamenteToCart(itemId, listaId) {
         alert('Erro: Configuração do pedido não encontrada.');
         return;
     }
-    
+
     try {
         // Fetch the exact configuration from the last order
         const url = baseUri + `/index/get_lista_item_config?lista_id=${listaId}`;
-        
+
         $.get(url, function(config) {
             if (config.error) {
                 alert('Erro ao buscar configuração do pedido.');
                 return;
             }
-            
+
             // Prepare cart data using the exact configuration from server
             // Use item_preco (base price) instead of lista_opcao_preco (which is total)
             const basePreco = parseFloat(config.item_preco) || 0;
-            
+
             // Calculate extras total from lista_opcao_vals
             let extrasTotal = 0;
             if (config.lista_opcao_vals) {
@@ -1262,10 +1269,10 @@ function addPedirNovamenteToCart(itemId, listaId) {
                     }
                 });
             }
-            
+
             const itemPreco = basePreco;
             const totalPreco = basePreco + extrasTotal;
-            
+
             const dados = {
                 item_id: config.lista_item,
                 item_estoque: 999, // High number to bypass stock check
@@ -1280,7 +1287,7 @@ function addPedirNovamenteToCart(itemId, listaId) {
                 extra_preco: extrasTotal,
                 total: totalPreco,
             };
-            
+
             // Add to cart via AJAX
             const addUrl = baseUri + "/carrinho/add/";
             $.post(addUrl, dados, function(response) {
@@ -1288,7 +1295,7 @@ function addPedirNovamenteToCart(itemId, listaId) {
             }).done(function() {
                 // Reload cart display
                 rebind_reload();
-                
+
                 // Show cart modal
                 setTimeout(function() {
                     $("#modal-carrinho").modal("show");
@@ -1297,11 +1304,11 @@ function addPedirNovamenteToCart(itemId, listaId) {
             }).fail(function(xhr, status, error) {
                 alert('Erro ao adicionar item ao carrinho.');
             });
-            
+
         }).fail(function(xhr, status, error) {
             alert('Erro ao buscar configuração do pedido.');
         });
-        
+
     } catch (e) {
         alert('Erro ao processar pedido: ' + e.message);
     }

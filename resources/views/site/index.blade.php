@@ -5,62 +5,8 @@
 
         @include('site.components.topo')
 
-        <!-- Mais Vendidos -->
-        @if (count($maisVendidos) > 0)
-            <div class="mais-vendidos-section">
-                <h2 class="section-title">Mais Pedidos</h2>
-                <div class="mais-vendidos-slick" id="topSold" aria-label="Carrossel dos itens mais pedidos">
-                    @foreach ($maisVendidos as $item)
-                        <article class="card" data-id="{{ $item->item_id }}">
-                            <div class="card-img-wrapper" style="position: relative;">
-                                @if ($item->item_foto)
-                                    <img src="{{ asset('assets/item/' . $item->item_foto) }}" alt="{{ $item->item_nome }}"
-                                        onerror="this.src='{{ asset('assets/img/sem_foto.jpg') }}'">
-                                @else
-                                    <img src="{{ asset('assets/img/sem_foto.jpg') }}" alt="{{ $item->item_nome }}">
-                                @endif
 
-                                <div class="tags-container">
-                                    @if ($item->media_vendida > 0)
-                                        <div class="tag-hot" data-id="{{ $item->item_id }}" aria-hidden="true">🔥 Mais
-                                            vendido</div>
-                                    @endif
-                                    @if ($item->item_promo == 1)
-                                        <div class="tag-promo" data-id="{{ $item->item_id }}" aria-hidden="true">💥
-                                            Promoção</div>
-                                    @endif
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="card-category-conteudo">
-                                    <div class="card-category-mais-vendidos"><b>{{ $item->categoria ?? '' }}</b></div>
-                                    <div class="card-title-mais-vendidos"><b>{{ $item->item_nome }}</b></div>
-                                    @if ($item->item_obs)
-                                        <div class="card-description"><strong>Ingredientes:</strong>
-                                            {{ strip_tags($item->item_obs) }}</div>
-                                    @endif
-                                    @if ($item->item_desc)
-                                        <div class="card-description"><strong>Descrição Breve:</strong>
-                                            {{ strip_tags($item->item_desc) }}</div>
-                                    @endif
-                                </div>
-                                <div class="card-price-mais-vendidos">
-                                    <b>R$ {{ number_format($item->item_preco, 2, ',', '.') }}</b>
-                                </div>
-                                <button class="btn-add mais-vendidos-btn-add" data-id="{{ $item->item_id }}"
-                                    data-nome="{{ $item->item_nome }}" data-obs="{{ strip_tags($item->item_obs ?? '') }}"
-                                    data-categoria="{{ $item->categoria }}"
-                                    data-categoria-nome="{{ $item->categoria ?? '' }}"
-                                    data-preco="{{ $item->item_preco }}" data-cod="{{ $item->item_codigo }}"
-                                    title="adicionar à sacola">
-                                    Adicionar
-                                </button>
-                            </div>
-                        </article>
-                    @endforeach
-                </div>
-            </div>
-        @endif
+        @include('site.produto.mais-vendidos', compact('maisVendidos'))
 
         <!-- Categorias -->
         <div class="categorias-section">
@@ -111,6 +57,16 @@
 
     <!-- Rodapé Fixo -->
     @include('site.components.footer')
+    @include('site.carrinho.side-carrinho')
+    <script type="text/javascript">
+        var currentUri = 'index';
+    </script>
+    @include('site.components.footer-core-js')
+    <script type="text/javascript" src="{{ asset('assets/vendor/slick/slick.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/number.js') }}"></script>
+    <script src="{{ asset('assets/js/howler.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/carrinho.js') }}?v={{ config('app.assets_version') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/modal-produto.js') }}?v={{ config('app.assets_version') }}"></script>
 
     @push('scripts')
         <script>
@@ -227,12 +183,6 @@
     @endpush
 
     @push('scripts')
-        <!-- Scripts do carrinho -->
-        <script type="text/javascript" src="{{ asset('assets/js/number.js') }}"></script>
-        <script src="{{ asset('assets/js/howler.js') }}"></script>
-        <script type="text/javascript" src="{{ asset('assets/js/carrinho.js') }}?v={{ time() }}"></script>
-        <script type="text/javascript" src="{{ asset('assets/js/modal-produto.js') }}"></script>
-
         <!-- Verificação de atualização de pedido -->
         @auth
         <script>
