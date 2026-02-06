@@ -74,5 +74,5 @@
     </body>
     <script type="text/javascript" src="<?php echo $baseUri; ?>/assets/vendor/jquery/jquery-2.1.4.min.js"></script>
     <script type="text/javascript" src="<?php echo $baseUri; ?>/assets/vendor/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="<?php echo $baseUri; ?>/view/site/app-js/main.js"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/main.js"></script>
 </html>

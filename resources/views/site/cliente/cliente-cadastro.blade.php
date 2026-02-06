@@ -51,13 +51,13 @@
 </body>
 <?php require 'side-carrinho.php'; ?>
 <?php require_once 'footer-core-js.php'; ?>
-<script type="text/javascript" src="<?php echo $baseUri; ?>/view/site/app-js/number.js"></script>
-<script type="text/javascript" src="<?php echo $baseUri; ?>/view/site/app-js/carrinho.js"></script>
+<script type="text/javascript" src="{{ asset('assets/js/number.js"></script>
+<script type="text/javascript" src="{{ asset('assets/js/carrinho.js"></script>
 <script type="text/javascript" src="<?php echo $baseUri; ?>/assets/vendor/jquery.select2/dist/js/select2.js"></script>
 <script type="text/javascript" src="<?php echo $baseUri; ?>/assets/vendor/jquery.maskedinput/jquery.maskedinput.js"></script>
 <script type="text/javascript" src="<?php echo $baseUri; ?>/assets/vendor/jquery.gritter/js/jquery.gritter.js"></script>
-<script type="text/javascript" src="<?php echo $baseUri; ?>/view/site/app-js/cliente.js"></script>
-<script type="text/javascript" src="<?php echo $baseUri; ?>/view/site/app-js/carrinho.js"></script>
+<script type="text/javascript" src="{{ asset('assets/js/cliente.js"></script>
+<script type="text/javascript" src="{{ asset('assets/js/carrinho.js"></script>
 <script>
     rebind_reload();
 </script>

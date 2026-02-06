@@ -10,7 +10,7 @@
 <script type="text/javascript" src="<?php echo $baseUri; ?>/assets/vendor/jquery.select2/dist/js/i18n/pt-BR.js"></script>
 <script type="text/javascript" src="<?php echo $baseUri; ?>/view/site/plugins/jquery.gritter/js/jquery.gritter.js"></script>
 <script type="text/javascript" src="<?php echo $baseUri; ?>/assets/vendor/jquery.maskedinput/jquery.maskedinput.js"></script>
-<script type="text/javascript" src="<?php echo $baseUri; ?>/view/site/app-js/main.js"></script>
+<script type="text/javascript" src="{{ asset('assets/js/main.js"></script>
 @if(session('cliente_id'))
     <script>
         function verificarAtualizacao(url, tituloAlerta) {

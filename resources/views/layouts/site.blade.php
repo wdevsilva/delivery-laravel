@@ -73,6 +73,9 @@
     <script src="{{ asset('assets/vendor/jquery.select2/dist/js/select2.full.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/jquery.gritter/js/jquery.gritter.js') }}"></script>
     <script src="{{ asset('assets/vendor/slick/slick.min.js') }}"></script>
+    <script src="{{ asset('assets/js/howler.js') }}"></script>
+    <script src="{{ asset('assets/js/modal-produto.js') }}"></script>
+    <script src="{{ asset('assets/js/carrinho.js') }}"></script>
 
     <script>
         // Esconder loader quando página carregar

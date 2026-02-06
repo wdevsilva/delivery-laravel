@@ -4,7 +4,7 @@ $(function() {
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
-    }); 
+    });
 
     sabores = 1;
     categoria = '';
@@ -553,7 +553,23 @@ $(document).ready(function() {
         }
     });
 
-    $(".modal-itens").on("hide.bs.modal", function() {
+    var modalAberturaTimestamp = {};
+
+    $(".modal-itens").on("show.bs.modal", function() {
+        var modalId = $(this).attr('id');
+        modalAberturaTimestamp[modalId] = Date.now();
+    });
+
+    $(".modal-itens").on("hide.bs.modal", function(e) {
+        var modalId = $(this).attr('id');
+        var tempoDecorrido = Date.now() - (modalAberturaTimestamp[modalId] || 0);
+
+        if (tempoDecorrido < 2000) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            return false;
+        }
+
         saboresSelect = 1;
 
         // Limpa sabores
@@ -590,7 +606,7 @@ function resetView(container) {
 
 function sound() {
     var sound = new Howl({
-        src: [baseUri + '/midias/alerta/addcarrinho.mp3'],
+        src: ["{{ asset('assets/midias/alerta/addcarrinho.mp3') }}"],
         volume: 1.0,
         autoplay: true,
     });

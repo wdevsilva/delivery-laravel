@@ -95,11 +95,11 @@
         var currentUri = 'index';
     </script>
     <?php require_once 'footer-core-js.php'; ?>
-    <script type="text/javascript" src="<?php echo $baseUri; ?>/view/site/app-js/main.js"></script>
-    <script type="text/javascript" src="<?php echo $baseUri; ?>/view/site/app-js/cliente.js"></script>
-    <script type="text/javascript" src="<?php echo $baseUri; ?>/view/site/app-js/number.js"></script>
-    <script src="<?php echo $baseUri; ?>/view/site/app-js/howler.js"></script>
-    <script type="text/javascript" src="<?php echo $baseUri; ?>/view/site/app-js/carrinho.js"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/main.js"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/cliente.js"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/number.js"></script>
+    <script src="{{ asset('assets/js/howler.js"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/carrinho.js"></script>
     <?php if (isset($_GET['success'])) : ?>
         <script type="text/javascript">
             __alert__success()

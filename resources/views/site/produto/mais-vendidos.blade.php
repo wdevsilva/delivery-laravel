@@ -55,34 +55,34 @@ if (is_object($maisVendidos) && method_exists($maisVendidos, 'toArray')) {
                 $img_url = $item_foto;
             @endphp
 
-            <article class="card <?= $semEstoque ? 'produto-sem-estoque' : '' ?>" data-id="<?= $item['item_id'] ?>">
+            <article class="card {{ ($semEstoque) ? 'produto-sem-estoque' : '' }}" data-id="{{ $item['item_id'] }}">
                 <div class="card-img-wrapper" style="position: relative;">
                     @if ($semEstoque)
                         <div style="position: absolute; top: 8px; right: 8px; background: #dc3545; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; z-index: 10; text-transform: uppercase;">ESGOTADO</div>
                     @endif
-                    <img src="<?= htmlspecialchars($img_url) ?>"
-                         alt="<?= htmlspecialchars($item['item_nome']) ?>"
+                    <img src="{{ htmlspecialchars($img_url) }}"
+                         alt="{{ htmlspecialchars($item['item_nome']) }}"
                          style="<?= $semEstoque ? 'filter: grayscale(100%); opacity: 0.6;' : '' ?>"
-                         onerror="this.onerror=null; this.src='<?= $semFoto ?>';">
+                         onerror="this.onerror=null; this.src='{{ $semFoto }}';">
 
                     <div class="tags-container">
                         @if (in_array($item['item_id'], $top3_ids))
-                            <div class="tag-hot" data-id="<?= $item['item_id']; ?>" aria-hidden="true">🔥 Mais vendido</div>
+                            <div class="tag-hot" data-id="{{ $item['item_id'] }}" aria-hidden="true">🔥 Mais vendido</div>
                         @endif
                         @if ($item['item_promo'] == 1)
-                            <div class="tag-promo" data-id="<?= $item['item_id']; ?>" aria-hidden="true">💥 Promoção</div>
+                            <div class="tag-promo" data-id="{{ $item['item_id'] }}" aria-hidden="true">💥 Promoção</div>
                         @endif
                     </div>
                 </div>
-                <div class="card-body" style="<?= $semEstoque ? 'opacity: 0.7;' : '' ?>">
+                <div class="card-body" style="{{ ($semEstoque) ? 'opacity: 0.7;' : '' }}">
                     <div class="card-category-conteudo">
-                        <div class="card-category-mais-vendidos"><b><?= $item['categoria']; ?></b></div>
-                        <div class="card-title-mais-vendidos"><b><?= htmlspecialchars($item['item_nome']); ?></b></div>
+                        <div class="card-category-mais-vendidos"><b>{{ $item['categoria'] }}</b></div>
+                        <div class="card-title-mais-vendidos"><b>{{ htmlspecialchars($item['item_nome']) }}</b></div>
                         @if (!empty($item['item_obs']))
-                            <div class="card-description"><strong>Ingredientes:</strong> <?= htmlspecialchars(strip_tags($item['item_obs'])); ?></div>
+                            <div class="card-description"><strong>Ingredientes:</strong> {{ htmlspecialchars(strip_tags($item['item_obs'])) }}</div>
                         @endif
                         @if (!empty($item['item_desc']))
-                            <div class="card-description"><strong>Descrição Breve:</strong> <?= htmlspecialchars(strip_tags($item['item_desc'])); ?></div>
+                            <div class="card-description"><strong>Descrição Breve:</strong> {{ htmlspecialchars(strip_tags($item['item_desc'])) }}</div>
                         @endif
                     </div>
                     <div class="card-price-mais-vendidos">
@@ -91,59 +91,100 @@ if (is_object($maisVendidos) && method_exists($maisVendidos, 'toArray')) {
                             <br><span style="color: #dc3545; font-size: 11px; font-weight: bold;">• SEM ESTOQUE</span>
                         @endif
                     </div>
-                    <?php
+                    @php
                     // Verifica se deve abrir modal:
                     // - APENAS se tem opções/adicionais
                     // - Descrição/ingredientes NÃO forçam abertura do modal
-                    $temOpcoes = (isset($item['opcoes'][0]) && count($item['opcoes']) > 0);
+                    $temOpcoes = (isset($item['opcoes']) && !empty($item['opcoes']) && is_array($item['opcoes']) && count($item['opcoes']) > 0);
                     $deveAbrirModal = $temOpcoes;
-                    ?>
-                    <?php if (!$semEstoque): ?>
+                    @endphp
+                    @if (!$semEstoque)
                         <button class="btn-add mais-vendidos-btn-add"
-                            <?php if ($deveAbrirModal): ?>
-                            data-toggle="modal" data-target="#item-<?= $item['item_id']; ?>"
-                            <?php endif; ?>
-                            data-estoque="<?= intval($item['item_estoque']); ?>"
-                            data-id="<?= $item['item_id']; ?>"
-                            data-nome="<?= htmlspecialchars($item['item_nome']); ?>"
-                            data-obs="<?= htmlspecialchars(strip_tags($item['item_obs'] ?? '')); ?>"
-                            data-categoria="<?= $item['categoria_id']; ?>"
-                            data-categoria-nome="<?= htmlspecialchars($item['categoria']); ?>"
-                            data-preco="<?= $item['item_preco']; ?>"
-                            data-cod="<?= $item['item_codigo']; ?>"
-                            data-tem-opcoes="<?= $deveAbrirModal ? '1' : '0'; ?>"
+                            @if ($deveAbrirModal)
+                                data-toggle="modal" data-target="#item-{{ $item['item_id'] }}"
+                            @endif
+                            data-estoque="{{ intval($item['item_estoque']) }}"
+                            data-id="{{ $item['item_id'] }}"
+                            data-nome="{{ htmlspecialchars($item['item_nome']) }}"
+                            data-obs="{{ htmlspecialchars(strip_tags($item['item_obs'] ?? '')) }}"
+                            data-categoria="{{ $item['categoria_id'] }}"
+                            data-categoria-nome="{{ htmlspecialchars($item['categoria']) }}"
+                            data-preco="{{ $item['item_preco'] }}"
+                            data-cod="{{ $item['item_codigo'] }}"
+                            data-tem-opcoes="{{ ($deveAbrirModal) ? 1 : 0 }}"
                             title="adicionar à sacola">
                             Adicionar
                         </button>
-                    <?php else: ?>
+                    @else
                         <button class="btn-add" style="background: #ccc; cursor: not-allowed; opacity: 0.6;" disabled>
                             Indisponível
                         </button>
-                    <?php endif; ?>
+                    @endif
                 </div>
             </article>
         @endforeach
     </div>
 
     <script>
-    // Intercepta clique nos botões "Adicionar" dos mais vendidos
-    $(document).on('click', '.mais-vendidos-btn-add', function(e) {
+    // DEBUG: Verificar se modais existem no DOM
+    $(document).ready(function() {
+        var totalModals = $('.modal-itens').length;
+        console.log('[DEBUG] Total de modais no DOM:', totalModals);
 
+        $('.modal-itens').each(function() {
+            console.log('[DEBUG] Modal encontrado:', $(this).attr('id'));
+        });
+
+        // Verificar botões
+        $('.mais-vendidos-btn-add').each(function() {
+            var temOpcoes = $(this).data('tem-opcoes');
+            var target = $(this).data('target');
+            console.log('[DEBUG] Botão:', {
+                temOpcoes: temOpcoes,
+                target: target,
+                toggle: $(this).data('toggle')
+            });
+        });
+    });
+
+    // Intercepta clique nos botões "Adicionar" dos mais vendidos APENAS para produtos SEM opções
+    $(document).on('click', '.mais-vendidos-btn-add', function(e) {
         var $btn = $(this);
         var temOpcoes = $btn.data('tem-opcoes') == '1';
 
-        // Se TEM opções, adiciona ao carrinho ANTES do modal abrir
+        // Se TEM opções, deixa o Bootstrap abrir o modal naturalmente via data-toggle
         if (temOpcoes) {
-            var itemId = $btn.data('id');
-            var itemNome = $btn.data('nome');
-            var itemObs = $btn.data('obs') || '';
-            var itemCategoria = $btn.data('categoria');
-            var categoriaNome = $btn.data('categoria-nome');
-            var itemPreco = parseFloat($btn.data('preco'));
-            var itemEstoque = parseInt($btn.data('estoque'));
-            var itemCod = $btn.data('cod');
+            return true;
+        }
 
-            // Adiciona ao carrinho SEM extras (só o produto base TEMPORÁRIO)
+        console.log('Produto SEM opções - adicionando direto ao carrinho');
+
+        // Se NÃO tem opções, adiciona direto ao carrinho SEM abrir modal
+        e.preventDefault();
+        e.stopPropagation();
+
+        var itemId = $btn.data('id');
+        var itemNome = $btn.data('nome');
+        var itemObs = $btn.data('obs') || '';
+        var itemCategoria = $btn.data('categoria');
+        var categoriaNome = $btn.data('categoria-nome');
+        var itemPreco = parseFloat($btn.data('preco'));
+        var itemEstoque = parseInt($btn.data('estoque'));
+        var itemCod = $btn.data('cod');
+
+        // Desabilita botão temporariamente
+        $btn.prop('disabled', true);
+
+        // Verifica estoque
+        var urlCheck = baseUri + "/carrinho/add_more/";
+        $.post(urlCheck, { id: itemId, hash: '', estoque: itemEstoque }, function(rs) {
+            if (rs == '-1') {
+                alert('Quantidade indisponível!');
+                $btn.prop('disabled', false);
+                return false;
+            }
+
+            // Prepara dados do item (sem extras/opções)
             var dados = {
                 item_id: itemId,
                 item_estoque: itemEstoque,
@@ -153,111 +194,50 @@ if (is_object($maisVendidos) && method_exists($maisVendidos, 'toArray')) {
                 categoria_id: itemCategoria,
                 item_obs: itemObs,
                 item_preco: itemPreco,
-                extra: '',
-                desc: '',
+                extra: '', // Sem extras
+                desc: '',  // Sem descrição adicional
                 extra_vals: '',
                 extra_preco: 0,
-                total: itemPreco,
-                temp_preview: 1 // Marca como temporário para ser substituído
+                total: itemPreco
             };
 
             // Adiciona ao carrinho
             var urlAdd = baseUri + "/carrinho/add/";
+            $.post(urlAdd, dados, function() {}).done(function() {
 
-            $.post(urlAdd, dados, function() {
-                // Recarrega o carrinho lateral
+                // Recarrega o carrinho
                 if (typeof rebind_reload === 'function') {
                     rebind_reload();
                 }
-            });
 
-            // Deixa o Bootstrap abrir o modal normalmente
-            return true;
-        }
+                // Feedback visual no botão
+                $btn.text('✓ Adicionado!');
+                $btn.addClass('btn-success');
 
-        // Se NÃO tem opções, adiciona direto ao carrinho SEM abrir modal
-        if (!temOpcoes) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            var itemId = $btn.data('id');
-            var itemNome = $btn.data('nome');
-            var itemObs = $btn.data('obs') || '';
-            var itemCategoria = $btn.data('categoria');
-            var categoriaNome = $btn.data('categoria-nome');
-            var itemPreco = parseFloat($btn.data('preco'));
-            var itemEstoque = parseInt($btn.data('estoque'));
-            var itemCod = $btn.data('cod');
-
-            // Desabilita botão temporariamente
-            $btn.prop('disabled', true);
-
-            // Verifica estoque
-            var urlCheck = baseUri + "/carrinho/add_more/";
-            $.post(urlCheck, { id: itemId, hash: '', estoque: itemEstoque }, function(rs) {
-                if (rs == '-1') {
-                    alert('Quantidade indisponível!');
-                    $btn.prop('disabled', false);
-                    return false;
+                // Toca som (se existir)
+                if (typeof sound === 'function') {
+                    sound();
                 }
 
-                // Prepara dados do item (sem extras/opções)
-                var dados = {
-                    item_id: itemId,
-                    item_estoque: itemEstoque,
-                    item_codigo: itemCod,
-                    item_nome: itemNome,
-                    categoria_nome: categoriaNome,
-                    categoria_id: itemCategoria,
-                    item_obs: itemObs,
-                    item_preco: itemPreco,
-                    extra: '', // Sem extras
-                    desc: '',  // Sem descrição adicional
-                    extra_vals: '',
-                    extra_preco: 0,
-                    total: itemPreco
-                };
+                // Abre o modal do carrinho após 300ms
+                setTimeout(function() {
+                    $('#modal-carrinho').modal('show');
+                }, 300);
 
-                // Adiciona ao carrinho
-                var urlAdd = baseUri + "/carrinho/add/";
-                $.post(urlAdd, dados, function() {}).done(function() {
-
-                    // Recarrega o carrinho
-                    if (typeof rebind_reload === 'function') {
-                        rebind_reload();
-                    }
-
-                    // Feedback visual no botão
-                    $btn.text('✓ Adicionado!');
-                    $btn.addClass('btn-success');
-
-                    // Toca som (se existir)
-                    if (typeof sound === 'function') {
-                        sound();
-                    }
-
-                    // Abre o modal do carrinho após 300ms
-                    setTimeout(function() {
-                        $('#modal-carrinho').modal('show');
-                    }, 300);
-
-                    // Reseta botão após 1.5s
-                    setTimeout(function() {
-                        $btn.text('Adicionar');
-                        $btn.removeClass('btn-success');
-                        $btn.prop('disabled', false);
-                    }, 1500);
-
-                }).fail(function() {
-                    alert('Erro ao adicionar item. Tente novamente.');
+                // Reseta botão após 1.5s
+                setTimeout(function() {
+                    $btn.text('Adicionar');
+                    $btn.removeClass('btn-success');
                     $btn.prop('disabled', false);
-                });
+                }, 1500);
+
+            }).fail(function() {
+                alert('Erro ao adicionar item. Tente novamente.');
+                $btn.prop('disabled', false);
             });
+        });
 
-            return false;
-        }
-
-        // Se TEM opções, deixa abrir o modal normalmente
+        return false;
     });
 
     // Initialize Slick Carousel for Mais Pedidos
@@ -268,12 +248,20 @@ if (is_object($maisVendidos) && method_exists($maisVendidos, 'toArray')) {
             const carousel = document.querySelector('.mais-vendidos-slick');
 
             if (!carousel || carousel.children.length === 0) {
+                console.log('[MAIS_VENDIDOS] Carousel não encontrado ou vazio');
                 return;
             }
 
             // Check if Slick is available
             if (typeof $ === 'undefined' || typeof $.fn.slick === 'undefined') {
                 console.error('[MAIS_VENDIDOS] Slick or jQuery not loaded!');
+                return;
+            }
+
+            // Verifica se já foi inicializado
+            var $carousel = $(carousel);
+            if ($carousel.hasClass('slick-initialized')) {
+                console.log('[MAIS_VENDIDOS] Slick já inicializado');
                 return;
             }
 
@@ -337,8 +325,10 @@ if (is_object($maisVendidos) && method_exists($maisVendidos, 'toArray')) {
     {{-- Mostra modal para todos os produtos que têm opções (com ou sem estoque) --}}
     @foreach ($maisVendidos as $item)
         @php
-            // Só cria modal se o produto tiver opções
-            if (!isset($item['opcoes'][0]) || count($item['opcoes']) === 0) {
+            // Só cria modal se o produto tiver opções (mesma verificação do botão)
+            $temOpcoes = (isset($item['opcoes']) && !empty($item['opcoes']) && is_array($item['opcoes']) && count($item['opcoes']) > 0);
+
+            if (!$temOpcoes) {
                 continue;
             }
 
@@ -346,9 +336,9 @@ if (is_object($maisVendidos) && method_exists($maisVendidos, 'toArray')) {
             $meia = 0; // Mais vendidos não usam sistema de sabores
             $iterator = 0;
             $itemAll = []; // Não há itemAll para mais vendidos
-
-            // Inclui o componente modal reutilizável
-            @include('site.componentes.modal-produto')
         @endphp
+
+        {{-- Inclui o componente modal reutilizável --}}
+        @include('site.components.modal-produto', compact('item', 'opcoes', 'meia', 'iterator', 'itemAll', 'config'))
     @endforeach
 @endif

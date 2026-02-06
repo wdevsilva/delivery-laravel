@@ -8,7 +8,8 @@ window.selectedItemsByModal = window.selectedItemsByModal || {};
 var selectedItems = {};
 
 // Adiciona classe 'selected' aos cards de opções quando selecionados
-$(document).on('change', '.opcao-card input[type="checkbox"], .opcao-card input[type="radio"]', function() {
+$(document).on('change', '.opcao-card input[type="checkbox"], .opcao-card input[type="radio"]', function(e) {
+    e.stopImmediatePropagation(); // Impede duplicação de eventos
     var $card = $(this).closest('.opcao-card');
     var $input = $(this);
 
@@ -80,7 +81,8 @@ $(document).on('change', '.opcao-card input[type="checkbox"], .opcao-card input[
     // Para radios, remove selected de outros cards do mesmo grupo
     if ($(this).attr('type') === 'radio') {
         var name = $(this).attr('name');
-        $('.opcao-card').has('input[name="' + name + '"]').not($card).removeClass('selected');
+        var $outrosCards = $('.opcao-card').has('input[name="' + name + '"]').not($card);
+        $outrosCards.removeClass('selected');
     }
 });
 
@@ -96,46 +98,46 @@ $(document).on('change', '.lista-sabores input[type="checkbox"]', function() {
     // NOVO: Para sabor único (meia = 1), desmarca outros sabores antes de selecionar um novo
     if (isChecked && maxSabores === 1) {
         var $modal = $('#item-' + itemId);
-        
+
         // Encontra e desmarca qualquer outro sabor selecionado
         var $outrosSabores = $modal.find('.sabores[data-item-id="' + itemId + '"]:checked').not($thisCheckbox);
-        
+
         $outrosSabores.each(function() {
             var $otherCheckbox = $(this);
             var $otherLabel = $otherCheckbox.closest('label');
             var otherSaborId = $otherCheckbox.data('id');
             var otherSaborNome = $otherCheckbox.data('nome');
             var otherItemKey = 'sab-' + otherSaborId;
-            
+
             // Remove visualmente
             $otherCheckbox.prop('checked', false);
             $otherLabel.removeClass('selected');
-            
+
             // Remove da sacola
             removeItemFromBar(otherItemKey, itemId);
         });
-        
+
         // Remove o produto principal anterior
         if (selectedItems['produto-principal']) {
             delete selectedItems['produto-principal'];
         }
-        
+
         // Remove TODOS os adicionais anteriores
         $modal.find('.opcao-card input:checked').each(function() {
             var $opcInput = $(this);
             var grupoId = $opcInput.data('grupo');
             var opcaoId = $opcInput.data('id');
             var opcKey = 'opt-' + grupoId + '-' + opcaoId;
-            
+
             // Remove da sacola
             delete selectedItems[opcKey];
-            
+
             // Desmarca visualmente
             $opcInput.prop('checked', false);
             $opcInput.closest('.opcao-card').removeClass('selected');
         });
     }
-    
+
     var selectedCount = $('.sabores[data-item-id="' + itemId + '"]:checked').length;
 
     if (isChecked) {
@@ -154,14 +156,14 @@ $(document).on('change', '.lista-sabores input[type="checkbox"]', function() {
         $header.find('.produto-nome').text(saborNome);
         $header.find('.produto-preco').text('R$ ' + saborPreco.toFixed(2).replace('.', ','));
         $header.fadeIn(300);
-        
+
         // CORRIGIDO: Adiciona o produto principal à sacola quando seleciona um sabor (meia = 1)
         if (maxSabores === 1) {
             // Remove produto anterior se houver
             if (selectedItems['produto-principal']) {
                 delete selectedItems['produto-principal'];
             }
-            
+
             // Adiciona novo produto com preço
             selectedItems['produto-principal'] = {
                 name: saborNome,
@@ -182,17 +184,17 @@ $(document).on('change', '.lista-sabores input[type="checkbox"]', function() {
         }
     } else {
         $label.removeClass('selected');
-        
+
         // NOVO: Ao desmarcar, remove o sabor da sacola
         var saborId = $thisCheckbox.data('id');
         var itemKey = 'sab-' + saborId;
         removeItemFromBar(itemKey, itemId);
-        
+
         // NOVO: Remove o produto principal da sacola (se existir)
         if (selectedItems['produto-principal']) {
             delete selectedItems['produto-principal'];
         }
-        
+
         // NOVO: Remove TODOS os adicionais quando desmarca o sabor
         var $modal = $('#item-' + itemId);
         $modal.find('.opcao-card input:checked').each(function() {
@@ -200,15 +202,15 @@ $(document).on('change', '.lista-sabores input[type="checkbox"]', function() {
             var grupoId = $opcInput.data('grupo');
             var opcaoId = $opcInput.data('id');
             var opcKey = 'opt-' + grupoId + '-' + opcaoId;
-            
+
             // Remove da sacola
             delete selectedItems[opcKey];
-            
+
             // Desmarca visualmente
             $opcInput.prop('checked', false);
             $opcInput.closest('.opcao-card').removeClass('selected');
         });
-        
+
         // Atualiza a sacola
         updateSelectedItemsBar(itemId);
 
@@ -252,29 +254,29 @@ $('.modal-itens').on('show.bs.modal', function(e) {
     $modal.find('.sabores').prop('checked', false).removeAttr('checked');
     $modal.find('.lista-sabores label').removeClass('selected');
     $modal.find('.lista-sabores').show().css('display', '');
-    
+
     // SÓ esconde o header se ele tiver ID (pizzas com múltiplos sabores)
     var $header = $modal.find('.produto-info-header');
     if ($header.attr('id')) {
         $header.hide();
     }
-    
+
     // Adiciona o produto principal à sacola flutuante automaticamente
     // EXCETO para categorias com múltiplos sabores (meia > 1)
     var itemId = $modal.attr('id').replace('item-', '');
     var $saboresInput = $modal.find('#sabores-' + itemId);
     var numSabores = $saboresInput.length ? parseInt($saboresInput.val()) : 0;
-    
+
     var produtoNome = $header.find('.produto-nome').text();
     var produtoPrecoText = $header.find('.produto-preco').text().replace('R$ ', '').replace(',', '.');
     var produtoPreco = parseFloat(produtoPrecoText) || 0;
-    
+
     // Reseta itens selecionados
     selectedItems = {};
-    
+
     // REMOVIDO: Não adiciona produto principal ao abrir modal
     // O produto será adicionado quando o usuário selecionar um sabor (evento 'change')
-    
+
     updateSelectedItemsBar(itemId);
 
     if (saborId) {
@@ -319,7 +321,7 @@ function updateSelectedItemsBar(itemId) {
     var $counter = $('#cart-count-' + itemId);
     var $popupBody = $('#popup-body-' + itemId);
     var $popupTotal = $('#popup-total-' + itemId);
-    
+
     // Sempre mostra a sacola se houver pelo menos o produto principal
     if (count === 0) {
         $badge.removeClass('show');
@@ -334,7 +336,7 @@ function updateSelectedItemsBar(itemId) {
         $.each(selectedItems, function(key, item) {
             var price = parseFloat(item.price) || 0;
             var isPrincipal = item.isPrincipal || false;
-            
+
             // Soma TUDO no total (produto + extras)
             totalGeral += price;
 
@@ -353,7 +355,7 @@ function updateSelectedItemsBar(itemId) {
 
             $popupBody.append(row);
         });
-       
+
         $popupTotal.text('R$ ' + totalGeral.toFixed(2).replace('.', ','));
     }
 }
@@ -539,12 +541,12 @@ $(document).on('click', '.lista-sabores label', function(e) {
     if (isChecked && maxSabores === 1) {
         // Remove o sabor da sacola
         removeItemFromBar(itemKey, itemId);
-        
+
         // NOVO: Remove o produto principal da sacola (se existir)
         if (selectedItems['produto-principal']) {
             delete selectedItems['produto-principal'];
         }
-        
+
         // NOVO: Remove TODOS os adicionais selecionados da sacola
         var $modal = $('#item-' + itemId);
         $modal.find('.opcao-card input:checked').each(function() {
@@ -552,18 +554,18 @@ $(document).on('click', '.lista-sabores label', function(e) {
             var grupoId = $opcInput.data('grupo');
             var opcaoId = $opcInput.data('id');
             var opcKey = 'opt-' + grupoId + '-' + opcaoId;
-            
+
             // Remove da sacola
             delete selectedItems[opcKey];
-            
+
             // Desmarca visualmente
             $opcInput.prop('checked', false);
             $opcInput.closest('.opcao-card').removeClass('selected');
         });
-        
+
         // Atualiza a sacola
         updateSelectedItemsBar(itemId);
-        
+
         // Desmarca o checkbox do sabor
         $input.click();
         return;

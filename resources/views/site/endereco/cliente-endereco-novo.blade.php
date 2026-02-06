@@ -119,11 +119,11 @@
         var currentUri = 'index';
     </script>
     <?php require_once 'footer-core-js.php'; ?>
-    <script type="text/javascript" src="<?php echo $baseUri; ?>/view/site/app-js/endereco.js"></script>
-    <script type="text/javascript" src="<?php echo $baseUri; ?>/view/site/app-js/pedido.js"></script>
-    <script type="text/javascript" src="<?php echo $baseUri; ?>/view/site/app-js/number.js"></script>
-    <script src="<?php echo $baseUri; ?>/view/site/app-js/howler.js"></script>
-    <script type="text/javascript" src="<?php echo $baseUri; ?>/view/site/app-js/carrinho.js"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/endereco.js"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/pedido.js"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/number.js"></script>
+    <script src="{{ asset('assets/js/howler.js"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/carrinho.js"></script>
     <script type="text/javascript">
         
 

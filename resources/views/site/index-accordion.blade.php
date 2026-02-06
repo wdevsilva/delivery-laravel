@@ -204,8 +204,8 @@
         </script>
         <?php require_once 'footer-core-js.php'; ?>
         <script type="text/javascript" src="<?php echo $baseUri; ?>/assets/vendor/slick/slick.min.js"></script>
-        <script type="text/javascript" src="<?php echo $baseUri; ?>/view/site/app-js/number.js"></script>
-        <script type="text/javascript" src="<?php echo $baseUri; ?>/view/site/app-js/carrinho.js"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/number.js"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/carrinho.js"></script>
         <script type="text/javascript">
             $('#busca').val('A');
             $('.add-item').addClass('returnIndex');

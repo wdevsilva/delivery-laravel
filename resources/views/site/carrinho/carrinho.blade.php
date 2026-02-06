@@ -516,32 +516,32 @@
         </div>
     </div>
     <div class="container"><a id="link-footer" name="link-footer"></a></div>
-    <?php require_once 'footer.php'; ?>
-    <?php require 'side-carrinho.php'; ?>
-    <?php require_once 'footer-core-js.php'; ?>
-    <?php if (isset($data['pagamento']) && is_object($data['pagamento']) && $data['pagamento']->pagamento_status == 1 && isset($data['url_js'])) : ?>
+    @include('site.components.footer')
+    @include('site.carrinho.side-carrinho')
+    @include('site.components.footer-core-js')
+    @if (isset($data['pagamento']) && is_object($data['pagamento']) && $data['pagamento']->pagamento_status == 1 && isset($data['url_js'])) : ?>
         <script type="text/javascript" src="<?= $data['url_js'] ?>"></script>
         <script>
             var pagseguro_id = "<?= $data['url_ssid'] ?>";
         </script>
-    <?php endif; ?>
+    @endif
     <script type="text/javascript">
-        var baseUri = '<?php echo $baseUri; ?>';
-        var BASE_URI = '<?php echo $baseUri; ?>'; // Para compatibilidade com cupom-auto-monitor.js
+        var baseUri = {{ $baseUri }};
+        var BASE_URI = {{ $baseUri }};
         // Usar total com descontos aplicados
-        var totalCompra = '<?= number_format($total_com_desconto, 2, '.', '') ?>';
-        var empresa = "<?= $_SESSION['base_delivery'] ?>";
-        var pedido_entrega_prazo = $('#pedido_entrega_prazo').val();
-        <?php if (isset($_SESSION['__LOCAL__'])) : ?>
+        var totalCompra = "{{ number_format($total_com_desconto, 2, '.', '') }}";
+        var empresa = "{{ $_SESSION['base_delivery'] }}";
+        var pedido_entrega_prazo = "{{ $pedido_entrega_prazo }}";
+        @if (isset($_SESSION['__LOCAL__']))
             <?php $local = intval($_SESSION['__LOCAL__']); ?>
             $('#pedido_local').val('<?= $local; ?>');
             setTimeout(function() {
                 $('#pedido_local').trigger('change');
             }, 300);
-        <?php endif; ?>
+        @endif
         $('#pedido_obs').focus();
 
-        <?php if (Carrinho::get_total() < $data['config']->config_pedmin) : ?>
+        @if (Carrinho::get_total() < $data['config']->config_pedmin)
             var url = baseUri + "/carrinho/reload/";
             $.post(url, {}, function(data) {
                 $("#carrinho-lista").html(data);
@@ -555,9 +555,9 @@
                     window.location = baseUri;
                 }, 4000)
             });
-        <?php endif; ?>
+        @endif
     </script>
-    <script type="text/javascript" src="<?php echo $baseUri; ?>/assets/vendor/jquery.maskedinput/jquery.mask.js"></script>
+    <script type="text/javascript" src="{{ asset('assets/vendor/jquery.maskedinput/jquery.mask.js') }}"></script>
     <script>
         // Converte o JSON gerado no PHP para uma variável JS
         const faixasCartao = <?php echo json_encode($data['faixasCartao']); ?>;
@@ -630,10 +630,9 @@
         var percentualDescontoFidelidade = 0;
         <?php endif; ?>
     </script>
-    <script type="text/javascript" src="<?php echo $baseUri; ?>/view/site/app-js/carrinho.js"></script>
-    <script type="text/javascript" src="<?php echo $baseUri; ?>/view/site/app-js/cupom-auto-monitor.js"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/cupom-auto-monitor.js') }}"></script>
     <script type="text/javascript">
-        // Call rebind_reload after carrinho.js is loaded
+
         rebind_reload();
 
         // 🎁 FUNÇÕES DE PONTOS DE FIDELIDADE
@@ -806,9 +805,9 @@
         }
     </script>
     <?php if (isset($data['pagamento']) && is_object($data['pagamento']) && $data['pagamento']->pagamento_status == 1) : ?>
-        <script type="text/javascript" src="<?php echo $baseUri; ?>/view/site/app-js/card.js"></script>
-        <script type="text/javascript" src="<?php echo $baseUri; ?>/view/site/app-js/pagseguro-checkout.js"></script>
-        <script type="text/javascript" src="<?php echo $baseUri; ?>/view/site/app-js/pagseguro.js"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/card.js"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/pagseguro-checkout.js"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/pagseguro.js"></script>
     <?php endif; ?>
 </body>
 

@@ -95,19 +95,19 @@ class CarrinhoController extends Controller
         header('Content-Type: application/json; charset=utf-8');
 
         try {
-            if (isset($_POST) && !empty($_POST) && isset($_POST['item_id'])) {
+            $data = $request->all();
+            if (!empty($data) && isset($data['item_id'])) {
 
-                $array = $_POST;
                 $object = new \stdClass();
-                foreach ($array as $key => $value) {
+                foreach ($data as $key => $value) {
                     $object->$key = Filter::trim_str($value);
                 }
 
                 // Remove itens temporários do mesmo produto se flag estiver ativa
-                if (isset($_POST['remove_temp']) && $_POST['remove_temp'] == 1) {
+                if (isset($data['remove_temp']) && $data['remove_temp'] == 1) {
                     if (isset($_SESSION['__APP__CART__'])) {
                         foreach ($_SESSION['__APP__CART__'] as $k => $cart_item) {
-                            if ($cart_item->item_id == $_POST['item_id'] &&
+                            if ($cart_item->item_id == $data['item_id'] &&
                                 isset($cart_item->temp_preview) && $cart_item->temp_preview == 1) {
                                 unset($_SESSION['__APP__CART__'][$k]);
                             }
@@ -130,12 +130,12 @@ class CarrinhoController extends Controller
 
                 if (isset($object->item_preco) && isset($object->item_nome)) {
                     // Accept qtde from POST, default to 1 if not provided
-                    $qtde_adicionar = isset($_POST['qtde']) && intval($_POST['qtde']) > 0 ? intval($_POST['qtde']) : 1;
+                    $qtde_adicionar = isset($data['qtde']) && intval($data['qtde']) > 0 ? intval($data['qtde']) : 1;
 
                     // Verificar se o produto já existe no carrinho (mesmo item_id e extras)
                     $item_existente = null;
                     $item_key = null;
-                    $extra_post = isset($_POST['extra']) ? $_POST['extra'] : '';
+                    $extra_post = isset($data['extra']) ? $data['extra'] : '';
 
                     if (isset($_SESSION['__APP__CART__'])) {
                         foreach ($_SESSION['__APP__CART__'] as $k => $cart_item) {

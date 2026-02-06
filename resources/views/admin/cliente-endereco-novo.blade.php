@@ -148,7 +148,7 @@
     </script>
     <script src="js/jquery.parsley/dist/parsley.js" type="text/javascript"></script>
     <script src="js/jquery.parsley/dist/pt-br.js" type="text/javascript"></script>
-    <script type="text/javascript" src="<?php echo $baseUri; ?>/view/site/app-js/endereco.js"></script>
+    <script type="text/javascript" src="<?php echo $baseUri; ?>/assets/js/endereco.js"></script>
     <script type="text/javascript">
         
     </script>

@@ -531,11 +531,11 @@
             var currentUri = 'index';
         </script>
         @include('site.footer-core-js')
-        <script type="text/javascript" src="<?php echo $baseUri; ?>/assets/vendor/slick/slick.min.js"></script>
-        <script type="text/javascript" src="<?php echo $baseUri; ?>/view/site/app-js/number.js"></script>
-        <script src="<?php echo $baseUri; ?>/view/site/app-js/howler.js"></script>
-        <script type="text/javascript" src="<?php echo $baseUri; ?>/view/site/app-js/carrinho.js?v=<?= time() ?>"></script>
-        <script type="text/javascript" src="<?php echo $baseUri; ?>/view/site/app-js/modal-produto.js?v=<?= time() ?>"></script>
+        <script type="text/javascript" src="{{ asset('assets/vendor/slick/slick.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/number.js') }}"></script>
+        <script src="{{ asset('assets/js/howler.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/carrinho.js') }}?v={{ time() }}"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/modal-produto.js') }}?v={{ time() }}"></script>
         <script type="text/javascript">
             // Intercepta clique nos produtos SEM opções das categorias
             $(document).on('click', '.add-item-categoria', function(e) {
@@ -622,8 +622,7 @@
 
                 return false;
             });
-        </script>
-        <script type="text/javascript">
+
             var backLinks = document.querySelectorAll('.voltar, .voltarFooter');
             backLinks.forEach(function(backLink) {
                 backLink.addEventListener('click', function(event) {
