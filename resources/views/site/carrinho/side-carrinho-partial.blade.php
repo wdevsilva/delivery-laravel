@@ -18,7 +18,8 @@
                     $cart->extra = $cart->extra ?? '';
                     $cart->qtde = $cart->qtde ?? 1;
                 @endphp
-                <div class="item item-carrinho" id="list-item-{{ $cart->item_hash }}" data-categoria-id="{{ $cart->categoria_id }}">
+                <div class="item item-carrinho" id="list-item-{{ $cart->item_hash }}"
+                    data-categoria-id="{{ $cart->categoria_id }}">
                     <div class="row">
                         <div class="col-md-5 col-xs-7">
                             <div class="row text-left">
@@ -52,8 +53,8 @@
                                         @if (strlen($cart->extra) > 2)
                                             @php
                                                 $extraFormatted = substr($cart->extra, 0, -2);
-                                                $extraLines = preg_split('/<br\s*\/?>/', $extraFormatted);
-                                            @endphp
+                                            $extraLines = preg_split('/<br\s*\/@endphp/', $extraFormatted);
+?>
                                             @foreach ($extraLines as $line)
                                                 @php
                                                     $line = trim($line);
@@ -84,8 +85,8 @@
                             @else
                                 @php
                                     $extraFormatted = substr($cart->extra, 0, -2);
-                                    $extraLines = preg_split('/<br\s*\/?>/', $extraFormatted);
-                                @endphp
+                                $extraLines = preg_split('/<br\s*\/@endphp/', $extraFormatted);
+?>
                                 @foreach ($extraLines as $line)
                                     @php
                                         $line = trim($line);
@@ -106,6 +107,152 @@
                 </div>
             @endforeach
         </div>
+
+        {{-- 🥤 SUGESTÃO DE BEBIDAS --}}
+        @php
+            // Verificar se há bebida no carrinho
+            $tem_bebida = false;
+            $categorias_bebida = ['bebida', 'bebidas', 'drinks', 'sucos', 'refrigerante', 'refrigerantes'];
+
+            foreach ($carrinho as $cart_item) {
+                $cart_item = (object) $cart_item;
+                $categoria_lower = mb_strtolower($cart_item->categoria_nome ?? '');
+                foreach ($categorias_bebida as $termo_bebida) {
+                    if (strpos($categoria_lower, $termo_bebida) !== false) {
+                        $tem_bebida = true;
+                        break 2;
+                    }
+                }
+            }
+
+            // Se NÃO tem bebida e ainda não foi dispensado nesta sessão
+            @session_start();
+            $bebida_dispensada = $_SESSION['__BEBIDA_DISPENSADA__'] ?? false;
+
+            $bebidas_disponiveis = [];
+            if (!$tem_bebida && !$bebida_dispensada) {
+                // Buscar categoria de bebidas
+                $todas_categorias = DB::table('categoria')->orderBy('categoria_pos', 'ASC')->get();
+                $categoria_bebida_id = null;
+
+                foreach ($todas_categorias as $cat) {
+                    $cat_lower = mb_strtolower($cat->categoria_nome);
+                    foreach ($categorias_bebida as $termo) {
+                        if (strpos($cat_lower, $termo) !== false) {
+                            $categoria_bebida_id = $cat->categoria_id;
+                            break 2;
+                        }
+                    }
+                }
+
+                // Se encontrou categoria de bebidas, buscar produtos
+                if ($categoria_bebida_id) {
+                    $bebidas = DB::table('item')
+                        ->where('item_categoria', $categoria_bebida_id)
+                        ->where('item_estoque', '>', 0)
+                        ->where('item_ativo', 1)
+                        ->limit(3)
+                        ->get();
+
+                    foreach ($bebidas as $bebida) {
+                        $bebidas_disponiveis[] = $bebida;
+                    }
+                }
+            }
+        @endphp
+
+        @if(count($bebidas_disponiveis) > 0)
+        <div id="sugestao-bebidas-modal" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px; border-radius: 10px; margin: 15px 0; position: relative;">
+            <button onclick="dispensarBebidas()" style="position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.3); border: none; color: white; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 18px; line-height: 1;" title="Não, obrigado">
+                ×
+            </button>
+            <div style="color: white;">
+                <h5 style="color: white; margin-top: 0; margin-bottom: 8px; font-size: 15px;">
+                    <i class="fa fa-lightbulb-o"></i> <strong>Que tal uma bebida?</strong>
+                </h5>
+                <p style="font-size: 12px; margin-bottom: 12px; opacity: 0.9;">Complete seu pedido:</p>
+
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    @foreach($bebidas_disponiveis as $bebida)
+                        @php
+                            $foto_bebida = !empty($bebida->item_foto)
+                                ? asset('assets/item/' . session('base_delivery') . '/' . $bebida->item_foto)
+                                : asset('assets/img/no-image.jpg');
+                        @endphp
+                        <div onclick="adicionarBebidaRapido({{ $bebida->item_id }}, '{{ addslashes($bebida->item_nome) }}', '{{ addslashes($bebida->categoria_nome ?? '') }}', {{ $bebida->item_categoria }}, {{ $bebida->item_preco }}, {{ $bebida->item_estoque }})"
+                            style="background: rgba(255,255,255,0.95); border-radius: 8px; padding: 10px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: transform 0.2s;"
+                            onmouseover="this.style.transform='scale(1.02)'"
+                            onmouseout="this.style.transform='scale(1)'">
+                            <img src="{{ $foto_bebida }}"
+                                alt="{{ $bebida->item_nome }}"
+                                style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px; flex-shrink: 0;">
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="font-weight: bold; font-size: 13px; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    {{ $bebida->item_nome }}
+                                </div>
+                                <div style="color: #667eea; font-weight: bold; font-size: 14px;">
+                                    R$ {{ \App\Helpers\Filter::moeda($bebida->item_preco) }}
+                                </div>
+                            </div>
+                            <i class="fa fa-plus-circle" style="color: #667eea; font-size: 24px; flex-shrink: 0;"></i>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
+        <script>
+        function adicionarBebidaRapido(itemId, itemNome, categoriaNome, categoriaId, itemPreco, itemEstoque) {
+            var dados = {
+                item_id: itemId,
+                item_estoque: itemEstoque,
+                item_codigo: '',
+                item_nome: itemNome,
+                categoria_nome: categoriaNome,
+                categoria_id: categoriaId,
+                item_obs: '',
+                item_preco: itemPreco,
+                extra: '',
+                desc: '',
+                extra_vals: '',
+                extra_preco: 0,
+                total: itemPreco,
+                qtde: 1,
+                item_hash: 'bebida_' + itemId + '_' + Date.now()
+            };
+
+            $.post(baseUri + "/carrinho/add", dados)
+                .done(function(response) {
+                    if (response.success) {
+                        $('#sugestao-bebidas-modal').fadeOut(300, function() {
+                            $(this).remove();
+                        });
+
+                        if (typeof rebind_reload === 'function') {
+                            rebind_reload();
+                        }
+
+                        if (typeof sound === 'function') {
+                            sound();
+                        }
+                    } else {
+                        alert('Erro: ' + response.error);
+                    }
+                })
+                .fail(function(xhr) {
+                    alert('Erro ao adicionar bebida. Tente novamente.');
+                });
+        }
+
+        function dispensarBebidas() {
+            $.post(baseUri + '/carrinho/dispensar_bebidas', {}).done(function() {
+                $('#sugestao-bebidas-modal').fadeOut(300, function() {
+                    $(this).remove();
+                });
+            });
+        }
+        </script>
+        @endif
 
         <!-- 🥤 SUGESTÃO DE BEBIDAS NO MODAL -->
         @php
@@ -208,12 +355,82 @@
 
         <div class="divi-btn-finaliza">
             <div class="row">
-                <div class="text-center" style="padding: 15px;">
-                    <button class="btn btn-block btn-success text-uppercase no-radius" data-dismiss="modal">
-                        <i class="fa fa-plus-circle"></i>
-                        escolher mais itens
-                    </button>
-                </div>
+                @if (isset($dados['config']) && $dados['config']->config_aberto == 1)
+                    <br>
+
+                    {{-- Total do Pedido --}}
+                    @php
+                        $total = 0;
+                        foreach ($carrinho as $item) {
+                            $item = (object) $item;
+                            $total += ($item->item_preco ?? 0) * ($item->qtde ?? 1);
+                        }
+                    @endphp
+
+                    <div class="alert alert-warning text-uppercase no-radius text-center">
+                        Total do Pedido: R$ {{ \App\Helpers\Filter::moeda($total) }}
+                    </div>
+
+                    {{-- Botão Escolher Mais Itens --}}
+                    <div class="text-center" style="padding: 15px;">
+                        <button class="btn btn-block btn-success text-uppercase no-radius" data-dismiss="modal">
+                            <i class="fa fa-plus-circle"></i>
+                            escolher mais itens
+                        </button>
+                    </div>
+
+                    <br>
+
+                    {{-- Verificar Valor Mínimo --}}
+                    @if ($total < ($dados['config']->config_pedmin ?? 0))
+                        <div class="text-center" style="padding: 0 15px;">
+                            <h4 class="text-danger">
+                                O VALOR MÍNIMO DO PEDIDO É DE R$
+                                {{ number_format($dados['config']->config_pedmin ?? 0, 2, ',', '.') }}<br>
+                                <small>Escolha algo mais para completar seu pedido!</small>
+                            </h4>
+                        </div>
+                    @else
+                        {{-- Botão Concluir Pedido --}}
+                        <div class="text-center" style="padding: 0 15px 15px;">
+                            @php
+                                $urlAtual = explode('/', request()->header('referer', ''));
+                                $isAdmin = isset($urlAtual[4]) && $urlAtual[4] == 'admin';
+                            @endphp
+                            @if ($isAdmin)
+                                @php
+                                    @session_start();
+                                    $cartTotal = 0;
+                                    if (isset($_SESSION['__APP__CART__'])) {
+                                        foreach ($_SESSION['__APP__CART__'] as $item) {
+                                            $cartTotal += ($item->item_preco ?? 0) * ($item->qtde ?? 1);
+                                        }
+                                    }
+                                @endphp
+                                <a href="{{ url('/admin/venda_checkout') }}"
+                                    class="btn btn-block btn-primary text-uppercase no-radius {{ $cartTotal <= 0 ? 'disabled' : '' }}">
+                                    <i class="fa fa-chevron-right"></i>
+                                    <i class="fa fa-chevron-right"></i>
+                                    concluir venda
+                                </a>
+                            @else
+                                <a href="{{ url('/carrinho') }}"
+                                    class="btn btn-block btn-primary text-uppercase no-radius">
+                                    <i class="fa fa-chevron-right"></i>
+                                    <i class="fa fa-chevron-right"></i>
+                                    Concluir meu pedido
+                                </a>
+                            @endif
+                        </div>
+                    @endif
+                @else
+                    {{-- Loja Fechada --}}
+                    <div class="text-center" style="padding: 15px;">
+                        <div class="alert alert-danger">
+                            <i class="fa fa-clock-o"></i> Estamos fechados no momento
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
@@ -224,8 +441,7 @@
             class="img-responsive">
         <h4 style="margin: 20px 0 10px;"><b>Carrinho Vazio</b></h4>
         <p class="text-muted" style="margin-bottom: 30px;">Adicione produtos para começar seu pedido</p>
-        <a href="{{ url('/') }}" class="btn btn-warning btn-lg btn-block text-uppercase"
-            style="padding: 15px; font-size: 16px;">
+        <a href="{{ url('/') }}" class="btn btn-warning btn-block text-uppercase">
             <i class="fa fa-shopping-cart"></i>
             Comece aqui o seu pedido
         </a>
