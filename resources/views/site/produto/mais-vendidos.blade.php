@@ -62,7 +62,7 @@ if (is_object($maisVendidos) && method_exists($maisVendidos, 'toArray')) {
                     @endif
                     <img src="{{ htmlspecialchars($img_url) }}"
                          alt="{{ htmlspecialchars($item['item_nome']) }}"
-                         style="<?= $semEstoque ? 'filter: grayscale(100%); opacity: 0.6;' : '' ?>"
+                         style="{{ ($semEstoque) ? 'filter: grayscale(100%); opacity: 0.6;' : '' }}"
                          onerror="this.onerror=null; this.src='{{ $semFoto }}';">
 
                     <div class="tags-container">
@@ -86,7 +86,7 @@ if (is_object($maisVendidos) && method_exists($maisVendidos, 'toArray')) {
                         @endif
                     </div>
                     <div class="card-price-mais-vendidos">
-                        <b>R$ <?= number_format($item['item_preco'], 2, ',', '.'); ?></b>
+                        <b>R$ {{ number_format($item['item_preco'], 2, ',', '.') }}</b>
                         @if ($semEstoque)
                             <br><span style="color: #dc3545; font-size: 11px; font-weight: bold;">• SEM ESTOQUE</span>
                         @endif
@@ -126,65 +126,23 @@ if (is_object($maisVendidos) && method_exists($maisVendidos, 'toArray')) {
     </div>
 
     <script>
-    // DEBUG: Verificar se modais existem no DOM
-    $(document).ready(function() {
-        var totalModals = $('.modal-itens').length;
-        console.log('[DEBUG] Total de modais no DOM:', totalModals);
-
-        $('.modal-itens').each(function() {
-            console.log('[DEBUG] Modal encontrado:', $(this).attr('id'));
-        });
-
-        // Verificar botões
-        $('.mais-vendidos-btn-add').each(function() {
-            var temOpcoes = $(this).data('tem-opcoes');
-            var target = $(this).data('target');
-            console.log('[DEBUG] Botão:', {
-                temOpcoes: temOpcoes,
-                target: target,
-                toggle: $(this).data('toggle')
-            });
-        });
-    });
-
     // Intercepta clique nos botões "Adicionar" dos mais vendidos APENAS para produtos SEM opções
     $(document).on('click', '.mais-vendidos-btn-add', function(e) {
         var $btn = $(this);
         var temOpcoes = $btn.data('tem-opcoes') == '1';
 
-        // Se TEM opções, deixa o Bootstrap abrir o modal naturalmente via data-toggle
+        // Se TEM opções, adiciona ao carrinho ANTES do modal abrir
         if (temOpcoes) {
-            return true;
-        }
+            var itemId = $btn.data('id');
+            var itemNome = $btn.data('nome');
+            var itemObs = $btn.data('obs') || '';
+            var itemCategoria = $btn.data('categoria');
+            var categoriaNome = $btn.data('categoria-nome');
+            var itemPreco = parseFloat($btn.data('preco'));
+            var itemEstoque = parseInt($btn.data('estoque'));
+            var itemCod = $btn.data('cod');
 
-        console.log('Produto SEM opções - adicionando direto ao carrinho');
-
-        // Se NÃO tem opções, adiciona direto ao carrinho SEM abrir modal
-        e.preventDefault();
-        e.stopPropagation();
-
-        var itemId = $btn.data('id');
-        var itemNome = $btn.data('nome');
-        var itemObs = $btn.data('obs') || '';
-        var itemCategoria = $btn.data('categoria');
-        var categoriaNome = $btn.data('categoria-nome');
-        var itemPreco = parseFloat($btn.data('preco'));
-        var itemEstoque = parseInt($btn.data('estoque'));
-        var itemCod = $btn.data('cod');
-
-        // Desabilita botão temporariamente
-        $btn.prop('disabled', true);
-
-        // Verifica estoque
-        var urlCheck = baseUri + "/carrinho/add_more/";
-        $.post(urlCheck, { id: itemId, hash: '', estoque: itemEstoque }, function(rs) {
-            if (rs == '-1') {
-                alert('Quantidade indisponível!');
-                $btn.prop('disabled', false);
-                return false;
-            }
-
-            // Prepara dados do item (sem extras/opções)
+            // Adiciona ao carrinho SEM extras (só o produto base TEMPORÁRIO)
             var dados = {
                 item_id: itemId,
                 item_estoque: itemEstoque,
@@ -194,50 +152,110 @@ if (is_object($maisVendidos) && method_exists($maisVendidos, 'toArray')) {
                 categoria_id: itemCategoria,
                 item_obs: itemObs,
                 item_preco: itemPreco,
-                extra: '', // Sem extras
-                desc: '',  // Sem descrição adicional
+                extra: '',
+                desc: '',
                 extra_vals: '',
                 extra_preco: 0,
-                total: itemPreco
+                total: itemPreco,
+                temp_preview: 1 // Marca como temporário para ser substituído
             };
 
             // Adiciona ao carrinho
             var urlAdd = baseUri + "/carrinho/add/";
-            $.post(urlAdd, dados, function() {}).done(function() {
-
-                // Recarrega o carrinho
+            $.post(urlAdd, dados, function() {
+                // Recarrega o carrinho lateral
                 if (typeof rebind_reload === 'function') {
                     rebind_reload();
                 }
+            });
 
-                // Feedback visual no botão
-                $btn.text('✓ Adicionado!');
-                $btn.addClass('btn-success');
+            // Deixa o Bootstrap abrir o modal normalmente
+            return true;
+        }
 
-                // Toca som (se existir)
-                if (typeof sound === 'function') {
-                    sound();
+        // Se NÃO tem opções, adiciona direto ao carrinho SEM abrir modal
+        if (!temOpcoes) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var itemId = $btn.data('id');
+            var itemNome = $btn.data('nome');
+            var itemObs = $btn.data('obs') || '';
+            var itemCategoria = $btn.data('categoria');
+            var categoriaNome = $btn.data('categoria-nome');
+            var itemPreco = parseFloat($btn.data('preco'));
+            var itemEstoque = parseInt($btn.data('estoque'));
+            var itemCod = $btn.data('cod');
+
+            // Desabilita botão temporariamente
+            $btn.prop('disabled', true);
+
+            // Verifica estoque
+            var urlCheck = baseUri + "/carrinho/add_more/";
+            $.post(urlCheck, { id: itemId, hash: '', estoque: itemEstoque }, function(rs) {
+                if (rs == '-1') {
+                    alert('Quantidade indisponível!');
+                    $btn.prop('disabled', false);
+                    return false;
                 }
 
-                // Abre o modal do carrinho após 300ms
-                setTimeout(function() {
-                    $('#modal-carrinho').modal('show');
-                }, 300);
+                // Prepara dados do item (sem extras/opções)
+                var dados = {
+                    item_id: itemId,
+                    item_estoque: itemEstoque,
+                    item_codigo: itemCod,
+                    item_nome: itemNome,
+                    categoria_nome: categoriaNome,
+                    categoria_id: itemCategoria,
+                    item_obs: itemObs,
+                    item_preco: itemPreco,
+                    extra: '', // Sem extras
+                    desc: '',  // Sem descrição adicional
+                    extra_vals: '',
+                    extra_preco: 0,
+                    total: itemPreco
+                };
 
-                // Reseta botão após 1.5s
-                setTimeout(function() {
-                    $btn.text('Adicionar');
-                    $btn.removeClass('btn-success');
+                // Adiciona ao carrinho
+                var urlAdd = baseUri + "/carrinho/add/";
+                $.post(urlAdd, dados, function() {}).done(function() {
+
+                    // Recarrega o carrinho
+                    if (typeof rebind_reload === 'function') {
+                        rebind_reload();
+                    }
+
+                    // Feedback visual no botão
+                    $btn.text('✓ Adicionado!');
+                    $btn.addClass('btn-success');
+
+                    // Toca som (se existir)
+                    if (typeof sound === 'function') {
+                        sound();
+                    }
+
+                    // Abre o modal do carrinho após 300ms
+                    setTimeout(function() {
+                        $('#modal-carrinho').modal('show');
+                    }, 300);
+
+                    // Reseta botão após 1.5s
+                    setTimeout(function() {
+                        $btn.text('Adicionar');
+                        $btn.removeClass('btn-success');
+                        $btn.prop('disabled', false);
+                    }, 1500);
+
+                }).fail(function() {
+                    alert('Erro ao adicionar item. Tente novamente.');
                     $btn.prop('disabled', false);
-                }, 1500);
-
-            }).fail(function() {
-                alert('Erro ao adicionar item. Tente novamente.');
-                $btn.prop('disabled', false);
+                });
             });
-        });
 
-        return false;
+            return false;
+        }
+
+        // Se TEM opções, deixa abrir o modal normalmente
     });
 
     // Initialize Slick Carousel for Mais Pedidos

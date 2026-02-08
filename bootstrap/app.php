@@ -12,6 +12,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Iniciar sessão PHP nativa ANTES do Laravel
+        if (!session_id()) {
+            @session_start();
+        }
+
         $middleware->web(append: [
             \App\Http\Middleware\TenantResolver::class,
         ]);

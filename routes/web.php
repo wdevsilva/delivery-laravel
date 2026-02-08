@@ -19,6 +19,42 @@ use App\Http\Controllers\Mesa\GarconController;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/index', [HomeController::class, 'index'])->name('home.index');
 
+// Teste sessão carrinho
+Route::get('/teste-carrinho-add', function() {
+    @session_start();
+
+    if (!isset($_SESSION['__APP__CART__'])) {
+        $_SESSION['__APP__CART__'] = [];
+    }
+
+    $item = new \stdClass();
+    $item->item_id = 18;
+    $item->item_nome = 'Coca-cola lata 350 ml';
+    $item->item_preco = 6;
+    $item->qtde = 1;
+    $item->item_hash = uniqid(time());
+
+    $_SESSION['__APP__CART__'][] = $item;
+
+    return response()->json([
+        'success' => true,
+        'session_id' => session_id(),
+        'total' => count($_SESSION['__APP__CART__'])
+    ]);
+});
+
+Route::get('/teste-carrinho-list', function() {
+    @session_start();
+
+    $carrinho = $_SESSION['__APP__CART__'] ?? [];
+
+    return response()->json([
+        'session_id' => session_id(),
+        'total' => count($carrinho),
+        'itens' => $carrinho
+    ]);
+});
+
 // Manifest PWA
 Route::get('/generate-manifest.php', function() {
     ob_start();
@@ -54,8 +90,7 @@ Route::get('/categoria/{id}', [App\Http\Controllers\CategoriaController::class, 
 // Carrinho (público)
 Route::prefix('carrinho')->group(function () {
     Route::get('/', [CarrinhoController::class, 'index'])->name('carrinho.index');
-    Route::post('/adicionar', [CarrinhoController::class, 'adicionar'])->name('carrinho.adicionar');
-    Route::post('/add', [CarrinhoController::class, 'adicionar']);
+    Route::post('/add', [CarrinhoController::class, 'add'])->name('carrinho.add');
     Route::post('/remover', [CarrinhoController::class, 'remover'])->name('carrinho.remover');
     Route::post('/atualizar', [CarrinhoController::class, 'atualizar'])->name('carrinho.atualizar');
     Route::get('/checkout', [CarrinhoController::class, 'checkout'])->name('carrinho.checkout');
@@ -66,8 +101,8 @@ Route::prefix('carrinho')->group(function () {
     Route::match(['GET', 'POST'], '/get_count_js', [CarrinhoController::class, 'getCountJs']);
     Route::match(['GET', 'POST'], '/get_count_bag', [CarrinhoController::class, 'getCountBag']);
     Route::post('/dispensar_bebidas', [CarrinhoController::class, 'dispensarBebidas']);
-    Route::post('/add_more', [CarrinhoController::class, 'addMore']);
-    Route::post('/del_more', [CarrinhoController::class, 'delMore']);
+    Route::post('/add_more', [CarrinhoController::class, 'add_more']);
+    Route::post('/del_more', [CarrinhoController::class, 'del_more']);
     Route::post('/del', [CarrinhoController::class, 'del']);
 });
 
@@ -160,3 +195,31 @@ Route::prefix('cozinha')->group(function () {
 // Rastreamento de Entrega (público)
 Route::get('/track/{code}', [PedidoController::class, 'track'])->name('pedido.track');
 Route::get('/rastrear/{code}', [PedidoController::class, 'track'])->name('pedido.rastrear');
+
+// Teste
+Route::get('/teste-sessao', function() {
+    $item = new \stdClass();
+    $item->item_id = 999;
+    $item->item_nome = 'Produto Teste';
+    $item->item_preco = 10.00;
+    $item->qtde = 1;
+    $item->item_hash = uniqid();
+    $item->item_estoque = 9999;
+    $item->categoria_id = 1;
+    $item->categoria_nome = 'Categoria Teste';
+    $item->item_obs = '';
+    $item->extra = '';
+    $item->extra_preco = 0;
+    $item->total = 10.00;
+
+    $cart = session('__APP__CART__', []);
+    $cart[] = $item;
+    session(['__APP__CART__' => $cart]);
+
+    echo '<pre>';
+    print_r(session('__APP__CART__'));
+    echo '</pre>';
+
+    return 'Item adicionado! Total: ' . count($cart);
+});
+

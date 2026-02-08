@@ -1,5 +1,6 @@
 @php
-    $carrinho = session('__APP__CART__', []);
+    @session_start();
+    $carrinho = $_SESSION['__APP__CART__'] ?? [];
     $isMobile = request()->header('User-Agent') && strpos(request()->header('User-Agent'), 'Mobile') !== false;
 @endphp
 
@@ -7,88 +8,96 @@
     <div class="panel-body" style="margin-top: 0px!important; padding-top: 0px!important">
         <div id="painel-carrinho">
             @foreach ($carrinho as $cart)
-                @php $cart = (object) $cart; @endphp
-                <div class="item item-carrinho" id="list-item-<?= $cart->item_hash ?>"
-                    data-categoria-id="<?= $cart->categoria_id ?>">
+                @php
+                    $cart = (object) $cart;
+                    // Garantir que todas as propriedades existam
+                    $cart->item_estoque = $cart->item_estoque ?? 0;
+                    $cart->categoria_id = $cart->categoria_id ?? '';
+                    $cart->categoria_nome = $cart->categoria_nome ?? '';
+                    $cart->item_obs = $cart->item_obs ?? '';
+                    $cart->extra = $cart->extra ?? '';
+                    $cart->qtde = $cart->qtde ?? 1;
+                @endphp
+                <div class="item item-carrinho" id="list-item-{{ $cart->item_hash }}" data-categoria-id="{{ $cart->categoria_id }}">
                     <div class="row">
                         <div class="col-md-5 col-xs-7">
                             <div class="row text-left">
                                 <a style="padding: 0;" title="-1" class="btn btn-light"
-                                    id="controleAddMore<?= $cart->item_id ?>" data-toggle="tooltip"
-                                    data-estoque="<?= $cart->item_estoque ?>" data-id="<?= $cart->item_id ?>"
-                                    data-hash="<?= $cart->item_hash ?>">
+                                    id="controleAddMore{{ $cart->item_id }}" data-toggle="tooltip"
+                                    data-estoque="{{ $cart->item_estoque }}" data-id="{{ $cart->item_id }}"
+                                    data-hash="{{ $cart->item_hash }}">
                                     <i class="fa fa-minus-circle btn-plus-minus fa-2x text-danger del-more"
-                                        data-estoque="<?= $cart->item_estoque ?>" data-id="<?= $cart->item_id ?>"
-                                        data-hash="<?= $cart->item_hash ?>"></i>
+                                        data-estoque="{{ $cart->item_estoque }}" data-id="{{ $cart->item_id }}"
+                                        data-hash="{{ $cart->item_hash }}"></i>
                                 </a>&nbsp;
-                                <span id="sp-qt-<?= $cart->item_hash ?>"
-                                    class="item-qtde qtde-item"><?= $cart->qtde <= 9 ? "0$cart->qtde" : $cart->qtde ?></span>
+                                <span id="sp-qt-{{ $cart->item_hash }}" class="item-qtde qtde-item">
+                                    {{ $cart->qtde <= 9 ? "0$cart->qtde" : $cart->qtde }}
+                                </span>
                                 <a style="padding: 0;" title="+1" class="btn btn-light"
-                                    id="controleAddDel<?= $cart->item_id ?>" data-toggle="tooltip"
-                                    data-estoque="<?= $cart->item_estoque ?>" data-id="<?= $cart->item_id ?>"
-                                    data-hash="<?= $cart->item_hash ?>">
+                                    id="controleAddDel{{ $cart->item_id }}" data-toggle="tooltip"
+                                    data-estoque="{{ $cart->item_estoque }}" data-id="{{ $cart->item_id }}"
+                                    data-hash="{{ $cart->item_hash }}">
                                     <i class="fa fa-plus-circle btn-plus-minus fa-2x text-success add-more"
-                                        data-estoque="<?= $cart->item_estoque ?>" data-id="<?= $cart->item_id ?>"
-                                        data-hash="<?= $cart->item_hash ?>"></i>
+                                        data-estoque="{{ $cart->item_estoque }}" data-id="{{ $cart->item_id }}"
+                                        data-hash="{{ $cart->item_hash }}"></i>
                                 </a>
                                 <span class="item-nome text-capitalize" style="padding-top: 2px">
-                                    <?php if (!empty($cart->categoria_nome ?? '')) : ?>
-                                    <?= $cart->categoria_nome ?>
-                                    <?php else : ?>
-                                    <?= $cart->item_nome ?>
-                                    <?php endif; ?>
-                                    <?php
-                                    // Se for mobile, mostra os extras (sabores, bordas, etc.)
-                                    if ($isMobile == 1) {
-                                        // Se tiver extras, mostra todos
-                                        if (strlen($cart->extra) > 2) {
-                                            // Parse e exibe extras formatados (preserva HTML como <b>Borda:</b>)
-                                            $extraFormatted = substr($cart->extra, 0, -2);
-                                            // Quebra por <br> para exibir cada linha
-                                            $extraLines = preg_split('/<br\s*\/?>/', $extraFormatted);
-                                    foreach($extraLines as $line) {
-                                    $line = trim($line);
-                                    if($line) {
-                                    echo '<br><small class="text-muted">' . $line . '</small>';
-                                    }
-                                    }
-                                    } else { ?>
-                                    <br>
-                                    <?= $cart->item_nome ?>
-                                    <?= mb_strtolower($cart->item_obs ?? '') ?>
-                                    <?php }
-                                    } ?>
-                                    <small class="item-estoque-<?= $cart->item_hash ?> text-danger"
+                                    @if (!empty($cart->categoria_nome))
+                                        {{ $cart->categoria_nome }}
+                                    @else
+                                        {{ $cart->item_nome }}
+                                    @endif
+
+                                    @if ($isMobile == 1)
+                                        @if (strlen($cart->extra) > 2)
+                                            @php
+                                                $extraFormatted = substr($cart->extra, 0, -2);
+                                                $extraLines = preg_split('/<br\s*\/?>/', $extraFormatted);
+                                            @endphp
+                                            @foreach ($extraLines as $line)
+                                                @php
+                                                    $line = trim($line);
+                                                @endphp
+                                                @if ($line)
+                                                    <br><small class="text-muted">{!! $line !!}</small>
+                                                @endif
+                                            @endforeach
+                                        @else
+                                            <br>
+                                            {{ $cart->item_nome }}
+                                            {{ mb_strtolower($cart->item_obs) }}
+                                        @endif
+                                    @endif
+                                    <small class="item-estoque-{{ $cart->item_hash }} text-danger"
                                         style="padding-top: 0px;padding-left: 5px;"></small>
                                 </span>
                             </div>
                         </div>
-                        <?php if (strrpos($cart->extra, '1/2') === false) { ?>
+                        @if (strrpos($cart->extra, '1/2') === false)
+                            <div class="col-md-5 hidden-xs">
+                                <small class="text-muted">{{ $cart->item_nome }}</small>
+                            </div>
+                        @endif
                         <div class="col-md-5 hidden-xs">
-                            <small class="text-muted"><?= $cart->item_nome ?></small>
-                        </div>
-                        <?php } ?>
-                        <div class="col-md-5 hidden-xs">
-                            <?php if (strlen($cart->extra) <= 0) : ?>
-                            <small class="text-muted"><?= mb_strtolower($cart->item_obs ?? '') ?></small><br>
-                            <?php else: ?>
-                            <?php
-                                    // Parse e exibe extras formatados (preserva HTML como <b>Borda:</b>)
+                            @if (strlen($cart->extra) <= 0)
+                                <small class="text-muted">{{ mb_strtolower($cart->item_obs) }}</small><br>
+                            @else
+                                @php
                                     $extraFormatted = substr($cart->extra, 0, -2);
-                                    // Quebra por <br> para exibir cada linha
                                     $extraLines = preg_split('/<br\s*\/?>/', $extraFormatted);
-                            foreach($extraLines as $line) {
-                            $line = trim($line);
-                            if($line) {
-                            // Permite HTML básico como <b> mas sanitiza o resto
-                                echo '<small class="text-muted">' . $line . '</small><br>';
-                                }
-                                }
-                                ?>
-                                <?php endif; ?>
+                                @endphp
+                                @foreach ($extraLines as $line)
+                                    @php
+                                        $line = trim($line);
+                                    @endphp
+                                    @if ($line)
+                                        <small class="text-muted">{!! $line !!}</small><br>
+                                    @endif
+                                @endforeach
+                            @endif
                         </div>
                         <div class="col-md-2 col-xs-5">
-                            R$ {{ \App\Helpers\Filter::moeda($cart->item_preco * $cart->qtde) }}
+                            R$ {{ \App\Helpers\Filter::moeda(($cart->item_preco ?? 0) * $cart->qtde) }}
                         </div>
                     </div>
                     <div class="row">

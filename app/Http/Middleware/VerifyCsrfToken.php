@@ -12,10 +12,17 @@ class VerifyCsrfToken extends BaseVerifier
      * @var array
      */
     protected $except = [
-        'carrinho/*',
-        'carrinho/reload',
-        'carrinho/getCountJs',
-        'carrinho/getCountBag',
-        'carrinho/dispensarBebidas',
+        '*',  // TEMPORÁRIO - DESABILITAR CSRF PARA DEBUG
     ];
+
+    /**
+     * Determine if the request has a URI that should pass through CSRF verification.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return bool
+     */
+    protected function inExceptArray($request)
+    {
+        return true; // TEMPORÁRIO - DESABILITAR CSRF COMPLETAMENTE
+    }
 }

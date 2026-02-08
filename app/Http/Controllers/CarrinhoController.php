@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Item;
 use App\Helpers\Filter;
 use App\Models\Categoria;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\Models\PromocaoModel;
+use App\Models\PromocaoModel;
 use App\Repositories\ItemRepository;
 use App\Repositories\ConfigRepository;
 use Illuminate\Support\Facades\Session;
@@ -31,12 +30,12 @@ class CarrinhoController extends Controller
 
     static public function _show()
     {
-        Filter::pre($_SESSION['__APP__CART__']);
+        Filter::pre(session('__APP__CART__'));
     }
 
     static public function isfull()
     {
-        if (isset($_SESSION['__APP__CART__']) && !empty($_SESSION['__APP__CART__'])) {
+        if (session()->has('__APP__CART__') && !empty(session('__APP__CART__'))) {
             return true;
         } else {
             return false;
@@ -45,8 +44,8 @@ class CarrinhoController extends Controller
 
     static public function count()
     {
-        if (isset($_SESSION['__APP__CART__']) && !empty($_SESSION['__APP__CART__'])) {
-            return count($_SESSION['__APP__CART__']);
+        if (session()->has('__APP__CART__') && !empty(session('__APP__CART__'))) {
+            return count(session('__APP__CART__'));
         } else {
             return 0;
         }
@@ -54,8 +53,8 @@ class CarrinhoController extends Controller
 
     static public function get_count()
     {
-        if (isset($_SESSION['__APP__CART__']) && count($_SESSION['__APP__CART__']) >= 1) {
-            return '<span class="badge">' . count($_SESSION['__APP__CART__']) . '</span>';
+        if (session()->has('__APP__CART__') && count(session('__APP__CART__')) >= 1) {
+            return '<span class="badge">' . count(session('__APP__CART__')) . '</span>';
         } else {
             return '';
         }
@@ -63,7 +62,9 @@ class CarrinhoController extends Controller
 
     static public function get_all()
     {
-        if (isset($_SESSION['__APP__CART__'])) {
+        @session_start();
+
+        if (isset($_SESSION['__APP__CART__']) && !empty($_SESSION['__APP__CART__'])) {
             return $_SESSION['__APP__CART__'];
         } else {
             return false;
@@ -79,8 +80,13 @@ class CarrinhoController extends Controller
         return $dados;
     }
 
-    public function adicionar(Request $request)
+    static public function add()
     {
+        @session_start();
+
+        error_log("[CARRINHO ADD] ========== MÉTODO EXECUTADO ==========");
+        error_log("[CARRINHO ADD] POST: " . print_r($_POST, true));
+
         // CRÍTICO: Suprimir QUALQUER output antes do JSON
         @ini_set('display_errors', '0');
         error_reporting(0);
@@ -95,21 +101,27 @@ class CarrinhoController extends Controller
         header('Content-Type: application/json; charset=utf-8');
 
         try {
-            $data = $request->all();
-            if (!empty($data) && isset($data['item_id'])) {
+            if (isset($_POST) && !empty($_POST) && isset($_POST['item_id'])) {
+                error_log("[CARRINHO] ========== POST RECEBIDO ==========");
+                error_log(print_r($_POST, true));
+                error_log("[CARRINHO] ========================================");
 
+                $array = $_POST;
                 $object = new \stdClass();
-                foreach ($data as $key => $value) {
+                foreach ($array as $key => $value) {
                     $object->$key = Filter::trim_str($value);
                 }
 
                 // Remove itens temporários do mesmo produto se flag estiver ativa
-                if (isset($data['remove_temp']) && $data['remove_temp'] == 1) {
+                if (isset($_POST['remove_temp']) && $_POST['remove_temp'] == 1) {
                     if (isset($_SESSION['__APP__CART__'])) {
                         foreach ($_SESSION['__APP__CART__'] as $k => $cart_item) {
-                            if ($cart_item->item_id == $data['item_id'] &&
-                                isset($cart_item->temp_preview) && $cart_item->temp_preview == 1) {
+                            if (
+                                $cart_item->item_id == $_POST['item_id'] &&
+                                isset($cart_item->temp_preview) && $cart_item->temp_preview == 1
+                            ) {
                                 unset($_SESSION['__APP__CART__'][$k]);
+                                error_log("[CARRINHO] Removido item temporário: {$cart_item->item_nome}");
                             }
                         }
                         // Reindexar array
@@ -119,7 +131,7 @@ class CarrinhoController extends Controller
 
                 // IMPORTANTE: Buscar o estoque do produto do banco de dados
                 if (isset($object->item_id)) {
-                    $itemDB = Item::find($object->item_id);
+                    $itemDB = DB::table('item')->where('item_id', $object->item_id)->first();
                     if ($itemDB) {
                         $object->item_estoque = intval($itemDB->item_estoque ?? 9999);
                     } else {
@@ -130,27 +142,43 @@ class CarrinhoController extends Controller
 
                 if (isset($object->item_preco) && isset($object->item_nome)) {
                     // Accept qtde from POST, default to 1 if not provided
-                    $qtde_adicionar = isset($data['qtde']) && intval($data['qtde']) > 0 ? intval($data['qtde']) : 1;
+                    $qtde_adicionar = isset($_POST['qtde']) && intval($_POST['qtde']) > 0 ? intval($_POST['qtde']) : 1;
 
                     // Verificar se o produto já existe no carrinho (mesmo item_id e extras)
                     $item_existente = null;
                     $item_key = null;
-                    $extra_post = isset($data['extra']) ? $data['extra'] : '';
+                    $extra_post = isset($_POST['extra']) ? $_POST['extra'] : '';
+
+                    error_log("[CARRINHO] Verificando se item {$object->item_id} já existe no carrinho");
+                    error_log("[CARRINHO] Extra do POST: " . $extra_post);
 
                     if (isset($_SESSION['__APP__CART__'])) {
+                        error_log("[CARRINHO] Total de itens no carrinho: " . count($_SESSION['__APP__CART__']));
                         foreach ($_SESSION['__APP__CART__'] as $k => $cart_item) {
+                            error_log("[CARRINHO] Item [$k]: ID={$cart_item->item_id}, Nome={$cart_item->item_nome}, Extra=" . (isset($cart_item->extra) ? $cart_item->extra : ''));
+
                             // Verifica se é o mesmo produto E tem os mesmos extras
-                            if ($cart_item->item_id == $object->item_id &&
-                                (isset($cart_item->extra) ? $cart_item->extra : '') == $extra_post) {
+                            if (
+                                $cart_item->item_id == $object->item_id &&
+                                (isset($cart_item->extra) ? $cart_item->extra : '') == $extra_post
+                            ) {
                                 $item_existente = $cart_item;
                                 $item_key = $k;
+                                error_log("[CARRINHO] MATCH encontrado! Item já existe na posição $k");
                                 break;
                             }
                         }
                     }
 
+                    if ($item_existente === null) {
+                        error_log("[CARRINHO] Item NÃO existe no carrinho, será adicionado como novo");
+                    } else {
+                        error_log("[CARRINHO] Item JÁ existe no carrinho, quantidade será incrementada");
+                    }
+
                     // Se o item já existe, incrementar quantidade
                     if ($item_existente !== null && $item_key !== null) {
+                        error_log("[CARRINHO] Item já existe, incrementando quantidade");
 
                         // Verificar estoque
                         $nova_qtde = intval($item_existente->qtde) + $qtde_adicionar;
@@ -158,6 +186,8 @@ class CarrinhoController extends Controller
 
                         if (self::check_exist($object)) {
                             $_SESSION['__APP__CART__'][$item_key]->qtde = $nova_qtde;
+                            error_log("[CARRINHO] Quantidade atualizada para: " . $nova_qtde);
+
                             echo json_encode(['success' => true, 'message' => 'Quantidade atualizada']);
                             exit;
                         } else {
@@ -175,7 +205,11 @@ class CarrinhoController extends Controller
                         $object->total = $preco_base + $preco_extras;
 
                         if (self::check_exist($object)) {
+                            error_log("[CARRINHO] Adicionando novo item ao carrinho: " . $object->item_nome . " | categoria_id: " . ($object->categoria_id ?? 'N/A'));
+                            error_log("[CARRINHO] Preço base: $preco_base | Extras: $preco_extras | Total: " . $object->total);
                             $_SESSION['__APP__CART__'][] = $object;
+                            error_log("[CARRINHO] Item adicionado! Total itens: " . count($_SESSION['__APP__CART__']));
+                            error_log("[CARRINHO] Session ID atual: " . session_id());
 
                             // Retornar sucesso em JSON
                             echo json_encode(['success' => true, 'message' => 'Produto adicionado']);
@@ -191,7 +225,6 @@ class CarrinhoController extends Controller
             // Se chegou aqui, algo deu errado
             echo json_encode(['success' => false, 'error' => 'Dados inválidos']);
             exit;
-
         } catch (\Exception $e) {
             error_log("[CARRINHO] Exceção: " . $e->getMessage());
             echo json_encode(['success' => false, 'error' => 'Erro interno: ' . $e->getMessage()]);
@@ -201,9 +234,9 @@ class CarrinhoController extends Controller
 
     public static function verifica_item($item = null)
     {
-        if (isset($_SESSION['__APP__CART__'])) {
-            foreach ($_SESSION['__APP__CART__'] as $k => $v) {
-                if ($_SESSION['__APP__CART__'][$k]->item_id === $item->item_id) {
+        if (session()->has('__APP__CART__')) {
+            foreach (session('__APP__CART__') as $k => $v) {
+                if (session('__APP__CART__')[$k]->item_id === $item->item_id) {
                     return true;
                 }
             }
@@ -240,11 +273,11 @@ class CarrinhoController extends Controller
 
         foreach ($carrinho as $item) {
             // Por categoria
-            if (!isset($por_categoria[$item->categoria_id])) {
-                $por_categoria[$item->categoria_id] = ['qtd' => 0, 'itens' => []];
+            if (!isset($por_categoria[$item->item_categoria])) {
+                $por_categoria[$item->item_categoria] = ['qtd' => 0, 'itens' => []];
             }
-            $por_categoria[$item->categoria_id]['qtd'] += $item->qtde;
-            $por_categoria[$item->categoria_id]['itens'][] = $item;
+            $por_categoria[$item->item_categoria]['qtd'] += $item->qtde;
+            $por_categoria[$item->item_categoria]['itens'][] = $item;
 
             // Por produto
             if (!isset($por_produto[$item->item_id])) {
@@ -258,7 +291,7 @@ class CarrinhoController extends Controller
             $premio = null;
 
             // Validar promoção
-            $cliente_id = $_SESSION['__CLIENTE__ID__'] ?? null;
+            $cliente_id = session('__CLIENTE__ID__') ?? null;
             $validacao = $promoModel->validar_promocao($promocao->promocao_id, $cliente_id);
 
             if (!$validacao['valido']) {
@@ -413,7 +446,7 @@ class CarrinhoController extends Controller
         foreach ($promocoes as $promo) {
             // No checkout (carrinho/pedido)
             if (strpos($uri, '/pedido/') !== false) {
-                ?>
+?>
                 <p class="text-capitalize">
                     <span class="badge badge-success"><i class="fa fa-gift"></i></span>
                     <span><?= $promo['qtd'] ?></span>
@@ -421,18 +454,18 @@ class CarrinhoController extends Controller
                     <?= $promo['produto'] ?>
                     <span class="pull-right text-success"><strong>GRÁTIS</strong></span>
                 </p>
-                <?php
+            <?php
             }
 
             // No modal de carrinho
             if (strpos($uri, '/carrinho/reload/') !== false) {
-                ?>
+            ?>
                 <div class="alert alert-success text-center">
                     <i class="fa fa-gift fa-2x"></i><br>
                     <strong><?= $promo['mensagem'] ?></strong><br>
                     <b><?= $promo['qtd'] . ' ' . $promo['produto'] ?></b>
                 </div>
-                <?php
+<?php
             }
         }
     }
@@ -441,6 +474,7 @@ class CarrinhoController extends Controller
     {
         $qtde = 0;
         $flag = false;
+        // USAR $_SESSION diretamente
         if (isset($_SESSION['__APP__CART__'])) {
             foreach ($_SESSION['__APP__CART__'] as $k => $v) {
                 if ($_SESSION['__APP__CART__'][$k]->item_id == $item->item_id) {
@@ -461,111 +495,93 @@ class CarrinhoController extends Controller
         }
     }
 
-    public function addMore(Request $request)
+    static public function add_more()
     {
-        $hash = $request->input('hash');
+        @session_start();
+
+        $hash = request()->input('hash');
         $item = new \stdClass;
-        $item->item_id = $request->input('id');
-        $item->item_estoque = $request->input('estoque');
-        if (!$this->check_exist($item)) {
+        $item->item_id = request()->input('id');
+        $item->item_estoque = request()->input('estoque');
+        if (!self::check_exist($item)) {
             echo '-1';
             exit;
         }
         if ($item->item_id > 0) {
-            $carrinho = session('__APP__CART__', []);
-            foreach ($carrinho as $k => $v) {
-                if ($carrinho[$k]->item_hash == $hash) {
-                    if ($carrinho[$k]->qtde + 1 <= $item->item_estoque) {
-                        $carrinho[$k]->qtde++;
-                        session(['__APP__CART__' => $carrinho]);
-                        if ($carrinho[$k]->qtde <= 9) {
-                            echo "0" . $carrinho[$k]->qtde;
+            if (isset($_SESSION['__APP__CART__'])) {
+                foreach ($_SESSION['__APP__CART__'] as $k => $v) {
+                    if ($_SESSION['__APP__CART__'][$k]->item_hash == $hash) {
+                        if ($_SESSION['__APP__CART__'][$k]->qtde + 1 <= $item->item_estoque) {
+                            $_SESSION['__APP__CART__'][$k]->qtde++;
+                            if ($_SESSION['__APP__CART__'][$k]->qtde <= 9) {
+                                echo "0" . $_SESSION['__APP__CART__'][$k]->qtde;
+                            } else {
+                                echo $_SESSION['__APP__CART__'][$k]->qtde;
+                            }
                         } else {
-                            echo $carrinho[$k]->qtde;
+                            echo '-1';
                         }
-                    } else {
-                        echo '-1';
                     }
                 }
             }
         }
     }
 
-    public function delMore(Request $request)
+    static public function del_more()
     {
-        $hash = $request->input('hash');
-        $id = $request->input('id');
+        @session_start();
+
+        error_log('[CARRINHO DEL_MORE] Início');
+        $hash = request()->input('hash');
+        $id = request()->input('id');
+        error_log('[CARRINHO DEL_MORE] Hash: ' . $hash . ', ID: ' . $id);
+
         if ($id > 0) {
             if (isset($_SESSION['__APP__CART__'])) {
+                error_log('[CARRINHO DEL_MORE] Carrinho tem ' . count($_SESSION['__APP__CART__']) . ' itens');
                 foreach ($_SESSION['__APP__CART__'] as $k => $v) {
                     if ($_SESSION['__APP__CART__'][$k]->item_hash == $hash) {
+                        error_log('[CARRINHO DEL_MORE] Item encontrado! Qtde atual: ' . $_SESSION['__APP__CART__'][$k]->qtde);
                         if ($_SESSION['__APP__CART__'][$k]->qtde > 1) {
                             $_SESSION['__APP__CART__'][$k]->qtde--;
+                            error_log('[CARRINHO DEL_MORE] Decrementou para: ' . $_SESSION['__APP__CART__'][$k]->qtde);
                             if ($_SESSION['__APP__CART__'][$k]->qtde <= 9)
                                 echo "0" . $_SESSION['__APP__CART__'][$k]->qtde;
                             else
                                 echo $_SESSION['__APP__CART__'][$k]->qtde;
                         } else {
+                            error_log('[CARRINHO DEL_MORE] Removendo item completamente');
                             if (isset($_SESSION['__APP__CART__'][$k])) {
                                 unset($_SESSION['__APP__CART__'][$k]);
                             }
                         }
+                        return;
                     }
                 }
             }
         }
     }
 
-    /**
-     * Remove completamente um item do carrinho pelo hash
-     * Usado quando o usuário clica no X para remover o item
-     */
-    static public function del(Request $request)
-    {
-        $hash = $request->input('hash');
-
-        if ($hash && isset($_SESSION['__APP__CART__'])) {
-            foreach ($_SESSION['__APP__CART__'] as $k => $v) {
-                if ($_SESSION['__APP__CART__'][$k]->item_hash == $hash) {
-                    unset($_SESSION['__APP__CART__'][$k]);
-                    // Reindexar o array
-                    $_SESSION['__APP__CART__'] = array_values($_SESSION['__APP__CART__']);
-                    echo 'OK';
-                    return;
-                }
-            }
-        }
-        echo 'ERROR';
-    }
-
     static public function clear()
     {
-        if (isset($_SESSION['__APP__CART__'])) {
-            unset($_SESSION['__APP__CART__']);
-        }
-        if (isset($_SESSION['__CUPOM__'])) {
-            unset($_SESSION['__CUPOM__']);
-        }
-        if (isset($_SESSION['__LOCAL__'])) {
-            unset($_SESSION['__LOCAL__']);
-        }
-        if (isset($_SESSION['__OBS__'])) {
-            unset($_SESSION['__OBS__']);
-        }
+        session()->forget('__APP__CART__');
+        session()->forget('__CUPOM__');
+        session()->forget('__LOCAL__');
+        session()->forget('__OBS__');
     }
 
     static public function get_total()
     {
-        if (isset($_SESSION['__APP__CART__'])) {
+        if (session()->has('__APP__CART__')) {
             $total = 0;
-            foreach ($_SESSION['__APP__CART__'] as $k) {
+            foreach (session('__APP__CART__') as $k) {
                 $total += (floatval($k->item_preco) + floatval($k->extra_preco)) * intval($k->qtde);
             }
-            if (isset($_SESSION['__CUPOM__']) && !empty($_SESSION['__CUPOM__'])) {
-                if ($_SESSION['__CUPOM__']->cupom_tipo == 1) {
-                    $total = $total - floatval($_SESSION['__CUPOM__']->cupom_valor);
+            if (session()->has('__CUPOM__') && !empty(session('__CUPOM__'))) {
+                if (session('__CUPOM__')->cupom_tipo == 1) {
+                    $total = $total - floatval(session('__CUPOM__')->cupom_valor);
                 } else {
-                    $desconto = (($total * intval($_SESSION['__CUPOM__']->cupom_percent)) / 100);
+                    $desconto = (($total * intval(session('__CUPOM__')->cupom_percent)) / 100);
                     $total = $total - $desconto;
                 }
             }
@@ -575,8 +591,8 @@ class CarrinhoController extends Controller
 
     static public function __show()
     {
-        if (isset($_SESSION['__APP__CART__'])) {
-            Filter::pre($_SESSION['__APP__CART__']);
+        if (session()->has('__APP__CART__')) {
+            Filter::pre(session('__APP__CART__'));
         }
     }
 
@@ -608,11 +624,40 @@ class CarrinhoController extends Controller
 
     public function reload()
     {
-        $carrinho = session('__APP__CART__', []);
+        @session_start();
 
-        return view('site.carrinho.side-carrinho-partial', [
-            'carrinho' => $carrinho
-        ]);
+        // USAR $_SESSION diretamente como no sistema antigo
+        $carrinho = $_SESSION['__APP__CART__'] ?? [];
+
+        // Log detalhado para debug
+        error_log("[CARRINHO RELOAD] ========================================");
+        error_log("[CARRINHO RELOAD] Session ID: " . session_id());
+        error_log("[CARRINHO RELOAD] Itens no carrinho: " . count($carrinho));
+        error_log("[CARRINHO RELOAD] ========================================");
+
+        $config = $this->configRepository->get_config();
+        $categorias = DB::table('categoria')->orderBy('categoria_pos', 'ASC')->get();
+        $cat_item = array();
+        $k = 0;
+
+        foreach ($categorias as $cat) {
+            $itens = $this->itemRepository->getByCategoria($cat->categoria_id);
+
+            $cat_item[$k]['categoria'] = $cat->categoria_nome;
+            $cat_item[$k]['categoria_id'] = $cat->categoria_id;
+            $cat_item[$k]['item'] = $itens;
+            $k++;
+        }
+
+        $dados = [
+            'config' => $config,
+            'lista' => (object)$cat_item
+        ];
+
+        // Renderizar view e retornar HTML puro (como no sistema antigo)
+        $html = view('site.carrinho.side-carrinho-partial', compact('dados'))->render();
+        echo $html;
+        exit;
     }
 
     static public function minimo()
@@ -632,18 +677,19 @@ class CarrinhoController extends Controller
      */
     static public function remove_by_category()
     {
-        $categoria_id = Req::post('categoria_id');
+        $categoria_id = request()->input('categoria_id');
         $removed_count = 0;
 
-        if (isset($_SESSION['__APP__CART__']) && $categoria_id > 0) {
-            foreach ($_SESSION['__APP__CART__'] as $k => $v) {
-                if ($_SESSION['__APP__CART__'][$k]->categoria_id == $categoria_id) {
-                    unset($_SESSION['__APP__CART__'][$k]);
+        if (session()->has('__APP__CART__') && $categoria_id > 0) {
+            $cart = session('__APP__CART__');
+            foreach ($cart as $k => $v) {
+                if ($cart[$k]->categoria_id == $categoria_id) {
+                    unset($cart[$k]);
                     $removed_count++;
                 }
             }
             // Reindexar o array após remoção
-            $_SESSION['__APP__CART__'] = array_values($_SESSION['__APP__CART__']);
+            session(['__APP__CART__' => array_values($cart)]);
         }
 
         echo $removed_count;
@@ -672,13 +718,13 @@ class CarrinhoController extends Controller
             $itens = [];
             $total = 0;
 
-            if (isset($_SESSION['__APP__CART__']) && !empty($_SESSION['__APP__CART__'])) {
-                foreach ($_SESSION['__APP__CART__'] as $item) {
+            if (session()->has('__APP__CART__') && !empty(session('__APP__CART__'))) {
+                foreach (session('__APP__CART__') as $item) {
                     $itens[] = [
                         'item_id' => $item->item_id ?? '',
                         'item_nome' => $item->item_nome ?? '',
                         'item_hash' => $item->item_hash ?? '',
-                        'categoria_id' => $item->categoria_id ?? '',
+                        'item_categoria' => $item->item_categoria ?? '',
                         'categoria_nome' => $item->categoria_nome ?? '',
                         'item_preco' => floatval($item->item_preco ?? 0),
                         'extra' => $item->extra ?? '',
@@ -697,7 +743,6 @@ class CarrinhoController extends Controller
                 'count' => count($itens)
             ]);
             exit;
-
         } catch (Exception $e) {
             error_log("[CARRINHO] Exceção em get_json: " . $e->getMessage());
             echo json_encode([
@@ -717,7 +762,7 @@ class CarrinhoController extends Controller
 
         try {
             // Verificar se cliente está logado
-            if (!isset($_SESSION['__CLIENTE__ID__'])) {
+            if (!session()->has('__CLIENTE__ID__')) {
                 echo json_encode(['success' => false, 'message' => 'Você precisa estar logado']);
                 exit;
             }
@@ -730,7 +775,7 @@ class CarrinhoController extends Controller
             }
 
             // Buscar configurações
-            $config = (new configModel)->get_config();
+            $config = $this->configRepository->getConfig();
             $pontos_minimo = (int)$config->config_pontos_para_resgatar;
             $valor_resgate = (float)$config->config_valor_resgate_pontos;
             $max_desconto = (float)$config->config_fidelidade_max_desconto;
@@ -744,7 +789,7 @@ class CarrinhoController extends Controller
 
             // Validar se cliente tem pontos suficientes
             $fidelidadeModel = new fidelidadeModel();
-            $saldo_data = $fidelidadeModel->get_saldo_cliente($_SESSION['__CLIENTE__ID__']);
+            $saldo_data = $fidelidadeModel->get_saldo_cliente(session('__CLIENTE__ID__'));
             $pontos_disponiveis = (int)$saldo_data['saldo_atual'];
 
             if ($pontos > $pontos_disponiveis) {
@@ -766,8 +811,8 @@ class CarrinhoController extends Controller
             }
 
             // Salvar na sessão
-            $_SESSION['__PONTOS_USADOS__'] = $pontos;
-            $_SESSION['__DESCONTO_PONTOS__'] = $desconto;
+            session(['__PONTOS_USADOS__' => $pontos]);
+            session(['__DESCONTO_PONTOS__' => $desconto]);
 
             echo json_encode([
                 'success' => true,
@@ -775,7 +820,6 @@ class CarrinhoController extends Controller
                 'pontos' => $pontos,
                 'desconto' => $desconto
             ]);
-
         } catch (Exception $e) {
             error_log('[FIDELIDADE] Erro ao aplicar pontos: ' . $e->getMessage());
             echo json_encode(['success' => false, 'message' => 'Erro ao aplicar pontos']);
@@ -789,7 +833,7 @@ class CarrinhoController extends Controller
      */
     public function dispensar_bebidas()
     {
-        $_SESSION['__BEBIDA_DISPENSADA__'] = true;
+        session(['__BEBIDA_DISPENSADA__' => true]);
         echo json_encode(['success' => true]);
         exit;
     }
@@ -802,14 +846,13 @@ class CarrinhoController extends Controller
         header('Content-Type: application/json');
 
         try {
-            unset($_SESSION['__PONTOS_USADOS__']);
-            unset($_SESSION['__DESCONTO_PONTOS__']);
+            session()->forget('__PONTOS_USADOS__');
+            session()->forget('__DESCONTO_PONTOS__');
 
             echo json_encode([
                 'success' => true,
                 'message' => 'Pontos removidos com sucesso!'
             ]);
-
         } catch (Exception $e) {
             error_log('[FIDELIDADE] Erro ao remover pontos: ' . $e->getMessage());
             echo json_encode(['success' => false, 'message' => 'Erro ao remover pontos']);

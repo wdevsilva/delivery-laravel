@@ -90,6 +90,16 @@
         var baseUrl = '{{ url('/') }}';
         var baseUri = baseUrl; // Alias para compatibilidade com scripts legados
         var isMobile = {{ request()->header('User-Agent') && strpos(request()->header('User-Agent'), 'Mobile') !== false ? 'true' : 'false' }};
+
+        // Configurar jQuery AJAX para enviar cookies de sessão
+        $.ajaxSetup({
+            xhrFields: {
+                withCredentials: true
+            },
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        });
     </script>
 
     <!-- Botão Flutuante WhatsApp -->

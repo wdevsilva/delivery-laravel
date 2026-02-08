@@ -14,7 +14,8 @@ $(function() {
     window.selectedBordas = window.selectedBordas || [];
 
     // Monitora TODAS as mudanças em inputs para capturar bordas IMEDIATAMENTE (GLOBAL, fora do ready)
-    $(document).on('change', 'input[data-nome]', function() {
+    $(document).on('change', 'input[data-nome]', function(e) {
+        e.stopImmediatePropagation(); // Impede duplicação de eventos
         var $input = $(this);
         var nome = $input.data('nome');
         var isChecked = $input.is(':checked');
@@ -111,6 +112,7 @@ $(function() {
             // Previne execução múltipla
             e.preventDefault();
             e.stopPropagation();
+            e.stopImmediatePropagation(); // Impede duplicação de eventos
 
             var $btn = $(this);
 
@@ -205,14 +207,8 @@ function processarAdicaoCarrinho($btn) {
         var item_cod = $btn.data("cod");
         var item_estoque = parseInt($btn.data("estoque"));
 
-        var url = baseUri + "/carrinho/add_more/";
-        $.post(url, { id: item_id, hash: item_hash, estoque: item_estoque }, function(rs) {
-            if (rs == '-1') {
-                $("#modal-carrinho").modal("show");
-                $('.item-estoque-' + item_hash).html('Quantidade indisponível!');
-                return false;
-            }
-        });
+        // NÃO USA add_more aqui! Usa carrinho/add (adiciona novo item)
+        // add_more é só para incrementar quantidade de item JÁ no carrinho
 
         var item_preco = parseFloat($btn.data("preco"));
         var optExtraValTotal = 0;
@@ -500,8 +496,12 @@ function processarAdicaoCarrinho($btn) {
 
         var url = baseUri + "/carrinho/add/";
 
+        console.log("[CARRINHO JS] Enviando dados para adicionar:", dados);
+
         // Aguarda o POST concluir ANTES de fechar o modal e limpar seleções
-        $.post(url, dados, function() {}).done(function() {
+        $.post(url, dados, function(response) {
+            console.log("[CARRINHO JS] Resposta do servidor:", response);
+        }).done(function() {
             // Sucesso - agora pode fechar o modal
             $("#item-" + item_id).modal("hide");
             saboresSelect = 1;
@@ -516,14 +516,14 @@ function processarAdicaoCarrinho($btn) {
             // Recarrega o carrinho
             rebind_reload();
 
-            // Mostra o carrinho e toca som
+            // Mostra o carrinho (sem som por enquanto)
             setTimeout(function() {
                 $("#modal-carrinho").modal("show");
-                sound();
             }, 500);
             $("#busca").val("");
-        }).fail(function() {
+        }).fail(function(xhr, status, error) {
             // Erro ao adicionar
+            console.error("[CARRINHO JS] Erro ao adicionar:", status, error, xhr.responseText);
             alert('Erro ao adicionar item ao carrinho. Tente novamente.');
         });
 }
@@ -1173,7 +1173,11 @@ function rebind_reload() {
 }
 
 function rebind_add() {
-    $(".add-more").on("click", function() {
+    // Remover eventos anteriores para evitar duplicação
+    $("#carrinho-lista").off("click", ".add-more");
+
+    // Usar event delegation para elementos dinâmicos
+    $("#carrinho-lista").on("click", ".add-more", function() {
         var id = parseInt($(this).data("id"));
         var hash = $(this).data("hash");
         var estoque = parseInt($(this).data("estoque"));
@@ -1192,7 +1196,11 @@ function rebind_add() {
 }
 
 function rebind_del() {
-    $(".del-more").on("click", function() {
+    // Remover eventos anteriores para evitar duplicação
+    $("#carrinho-lista").off("click", ".del-more");
+
+    // Usar event delegation para elementos dinâmicos
+    $("#carrinho-lista").on("click", ".del-more", function() {
         var id = parseInt($(this).data("id"));
         var hash = $(this).data("hash");
         var url = baseUri + "/carrinho/del_more/";

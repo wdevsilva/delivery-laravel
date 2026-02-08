@@ -9,7 +9,10 @@ var selectedItems = {};
 
 // Adiciona classe 'selected' aos cards de opções quando selecionados
 $(document).on('change', '.opcao-card input[type="checkbox"], .opcao-card input[type="radio"]', function(e) {
-    e.stopImmediatePropagation(); // Impede duplicação de eventos
+    // Marca como processado para evitar duplicação
+    if ($(this).data('_processing')) return;
+    $(this).data('_processing', true);
+
     var $card = $(this).closest('.opcao-card');
     var $input = $(this);
 
@@ -81,13 +84,21 @@ $(document).on('change', '.opcao-card input[type="checkbox"], .opcao-card input[
     // Para radios, remove selected de outros cards do mesmo grupo
     if ($(this).attr('type') === 'radio') {
         var name = $(this).attr('name');
-        var $outrosCards = $('.opcao-card').has('input[name="' + name + '"]').not($card);
-        $outrosCards.removeClass('selected');
+        $('.opcao-card').has('input[name="' + name + '"]').not($card).removeClass('selected');
     }
+
+    // Reseta flag após processamento
+    setTimeout(function() {
+        $input.data('_processing', false);
+    }, 100);
 });
 
 // Adiciona feedback visual aos sabores
-$(document).on('change', '.lista-sabores input[type="checkbox"]', function() {
+$(document).on('change', '.lista-sabores input[type="checkbox"]', function(e) {
+    // Marca como processado para evitar duplicação
+    if ($(this).data('_processing')) return;
+    $(this).data('_processing', true);
+
     var $label = $(this).closest('label');
     var itemId = $(this).data('item-id');
     var maxSabores = parseInt($('#sabores-' + itemId).val()) || 1;
@@ -232,6 +243,11 @@ $(document).on('change', '.lista-sabores input[type="checkbox"]', function() {
             scrollToNextSection($currentSection, true); // Sabores sempre rolam quando atingem limite
         }, 400); // Aguarda slideUp completar
     }
+
+    // Reseta flag após processamento
+    setTimeout(function() {
+        $thisCheckbox.data('_processing', false);
+    }, 100);
 });
 
 // Inicializa cards já selecionados
@@ -365,7 +381,17 @@ $(document).on('click', '.floating-cart-badge', function(e) {
     e.stopPropagation();
     var itemId = $(this).attr('id').replace('floating-cart-', '');
     var $popup = $('#popup-' + itemId);
-    $popup.toggleClass('show');
+
+    if ($popup.hasClass('show')) {
+        $popup.removeClass('show');
+    } else {
+        $popup.addClass('show');
+        // Força display flex e z-index alto
+        $popup.css({
+            'display': 'flex',
+            'z-index': '99999'
+        });
+    }
 });
 
 // Fecha o popup ao clicar fora
