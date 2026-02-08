@@ -56,6 +56,11 @@
                     e.stopPropagation();
                     $('#modal-carrinho').modal('show');
                 });
+
+                // Atualizar contador do carrinho ao carregar a página
+                if (typeof rebind_get_count === 'function') {
+                    rebind_get_count();
+                }
             });
             </script>
         @endif

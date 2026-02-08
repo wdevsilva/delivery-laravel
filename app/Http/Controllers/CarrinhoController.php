@@ -601,9 +601,14 @@ class CarrinhoController extends Controller
      */
     public function getCountJs()
     {
-        $carrinho = session('__APP__CART__', []);
+        @session_start();
+        $carrinho = $_SESSION['__APP__CART__'] ?? [];
         if (!empty($carrinho)) {
-            echo '<span class="badge">' . count($carrinho) . '</span>';
+            $total_itens = 0;
+            foreach ($carrinho as $item) {
+                $total_itens += intval($item->qtde ?? 1);
+            }
+            echo '<span class="badge">' . $total_itens . '</span>';
         } else {
             echo '';
         }
@@ -820,7 +825,7 @@ class CarrinhoController extends Controller
                 'pontos' => $pontos,
                 'desconto' => $desconto
             ]);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log('[FIDELIDADE] Erro ao aplicar pontos: ' . $e->getMessage());
             echo json_encode(['success' => false, 'message' => 'Erro ao aplicar pontos']);
         }
@@ -833,7 +838,8 @@ class CarrinhoController extends Controller
      */
     public function dispensar_bebidas()
     {
-        session(['__BEBIDA_DISPENSADA__' => true]);
+        @session_start();
+        $_SESSION['__BEBIDA_DISPENSADA__'] = true;
         echo json_encode(['success' => true]);
         exit;
     }
@@ -853,7 +859,7 @@ class CarrinhoController extends Controller
                 'success' => true,
                 'message' => 'Pontos removidos com sucesso!'
             ]);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log('[FIDELIDADE] Erro ao remover pontos: ' . $e->getMessage());
             echo json_encode(['success' => false, 'message' => 'Erro ao remover pontos']);
         }

@@ -1161,14 +1161,13 @@ function rebind_reload() {
     var url = baseUri + "/carrinho/reload/";
     $.post(url, {}, function(data) {
         $("#carrinho-lista").html(data);
+        // Atualiza contador imediatamente após reload
+        rebind_get_count();
     }).then(function() {
-        setTimeout(function() {
-            rebind_add();
-            rebind_del();
-            rebind_get_count();
-            rebind_get_count_bag();
-            $('[data-toggle="tooltip"]').tooltip();
-        }, 500)
+        rebind_add();
+        rebind_del();
+        rebind_get_count_bag();
+        $('[data-toggle="tooltip"]').tooltip();
     });
 }
 
@@ -1225,6 +1224,9 @@ function rebind_get_count() {
         $("#cart-count").html(rs);
     });
 }
+
+// Tornar rebind_get_count global
+window.rebind_get_count = rebind_get_count;
 
 function rebind_get_count_bag() {
     var url = baseUri + "/carrinho/get_count_bag/";

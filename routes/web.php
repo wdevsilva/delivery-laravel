@@ -100,7 +100,7 @@ Route::prefix('carrinho')->group(function () {
     Route::match(['GET', 'POST'], '/reload', [CarrinhoController::class, 'reload']);
     Route::match(['GET', 'POST'], '/get_count_js', [CarrinhoController::class, 'getCountJs']);
     Route::match(['GET', 'POST'], '/get_count_bag', [CarrinhoController::class, 'getCountBag']);
-    Route::post('/dispensar_bebidas', [CarrinhoController::class, 'dispensarBebidas']);
+    Route::post('/dispensar_bebidas', [CarrinhoController::class, 'dispensar_bebidas']);
     Route::post('/add_more', [CarrinhoController::class, 'add_more']);
     Route::post('/del_more', [CarrinhoController::class, 'del_more']);
     Route::post('/del', [CarrinhoController::class, 'del']);

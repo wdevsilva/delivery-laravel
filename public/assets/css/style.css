@@ -109,6 +109,33 @@ html,
     border-radius: 0px !important;
 }
 
+/* Contador do carrinho */
+#cart-count {
+    display: inline-block;
+    min-width: 18px;
+    padding: 3px 6px;
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    background-color: #ff0000;
+    border-radius: 10px;
+    position: absolute;
+    top: -5px;
+    right: -5px;
+}
+
+#cart-count:empty {
+    display: none;
+}
+
+.icon-container {
+    position: relative;
+}
+
 #painel-carrinho .mar-right-3 {
     margin-right: 3px;
 }
