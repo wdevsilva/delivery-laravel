@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Endereco extends Model
+class EnderecoModel extends Model
 {
     protected $table = 'endereco';
     protected $primaryKey = 'endereco_id';
@@ -12,6 +12,7 @@ class Endereco extends Model
 
     protected $fillable = [
         'endereco_cliente',
+        'endereco_nome',
         'endereco_endereco',
         'endereco_numero',
         'endereco_bairro',
@@ -19,11 +20,14 @@ class Endereco extends Model
         'endereco_uf',
         'endereco_cep',
         'endereco_referencia',
+        'endereco_complemento',
+        'endereco_lat',
+        'endereco_lng',
     ];
 
     public function cliente()
     {
-        return $this->belongsTo(Cliente::class, 'endereco_cliente', 'cliente_id');
+        return $this->belongsTo(ClienteModel::class, 'endereco_cliente', 'cliente_id');
     }
 
     public function getEnderecoCompletoAttribute()

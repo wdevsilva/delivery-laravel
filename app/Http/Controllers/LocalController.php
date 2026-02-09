@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ConfigModel;
+use App\Models\ClienteModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -13,7 +15,7 @@ class LocalController extends Controller
         // Definir base_delivery na sessão se não existir
         @session_start();
         if (!isset($_SESSION['base_delivery'])) {
-            $config = \App\Models\ConfigModel::first();
+            $config = ConfigModel::first();
             $_SESSION['base_delivery'] = $config->config_token ?? 'default';
             session(['base_delivery' => $_SESSION['base_delivery']]);
         }
@@ -119,8 +121,8 @@ class LocalController extends Controller
         $cliente_id = $_SESSION['__CLIENTE__ID__'];
         $return = $request->input('return', '');
 
-        $config = \App\Models\ConfigModel::first();
-        $cliente = \App\Models\Cliente::find($cliente_id);
+        $config = ConfigModel::first();
+        $cliente = ClienteModel::find($cliente_id);
 
         // Buscar bairros atendidos
         $bairros = DB::table('bairro')
@@ -150,8 +152,8 @@ class LocalController extends Controller
 
         $cliente_id = $_SESSION['__CLIENTE__ID__'];
 
-        $config = \App\Models\ConfigModel::first();
-        $cliente = \App\Models\Cliente::find($cliente_id);
+        $config = ConfigModel::first();
+        $cliente = ClienteModel::find($cliente_id);
 
         // Buscar endereços do cliente com informações do bairro
         $enderecos = DB::table('endereco')

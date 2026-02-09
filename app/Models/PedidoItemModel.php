@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class PedidoItem extends Model
+class PedidoItemModel extends Model
 {
     protected $table = 'pedido_lista';
     protected $primaryKey = 'lista_id';
@@ -29,12 +29,12 @@ class PedidoItem extends Model
 
     public function pedido()
     {
-        return $this->belongsTo(Pedido::class, 'lista_pedido', 'pedido_id');
+        return $this->belongsTo(PedidoModel::class, 'lista_pedido', 'pedido_id');
     }
 
     public function item()
     {
-        return $this->belongsTo(Item::class, 'lista_item', 'item_id');
+        return $this->belongsTo(ItemModel::class, 'lista_item', 'item_id');
     }
 
     public function getSubtotalAttribute()

@@ -148,6 +148,8 @@ Route::group([], function () {
     Route::get('/meus-pedidos', [PedidoController::class, 'lista'])->name('cliente.pedidos');
     Route::get('/pedido/{id}', [PedidoController::class, 'detalhes'])->name('cliente.pedido.detalhes');
     Route::get('/meus-enderecos', [ClienteController::class, 'enderecos'])->name('cliente.enderecos');
+    Route::get('/novo-endereco', [ClienteController::class, 'novoEndereco'])->name('cliente.endereco.novo');
+    Route::get('/editar-endereco/{id}', [ClienteController::class, 'editarEndereco'])->name('cliente.endereco.editar');
     Route::post('/endereco/salvar', [ClienteController::class, 'salvarEndereco'])->name('cliente.endereco.salvar');
     Route::delete('/endereco/{id}', [ClienteController::class, 'removerEndereco'])->name('cliente.endereco.remover');
     Route::get('/meus-dados', [ClienteController::class, 'dados'])->name('cliente.dados');

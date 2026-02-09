@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Cliente extends Authenticatable
+class ClienteModel extends Authenticatable
 {
     protected $table = 'cliente';
     protected $primaryKey = 'cliente_id';
@@ -20,6 +20,7 @@ class Cliente extends Authenticatable
         'cliente_senha',
         'cliente_nasc',
         'cliente_status',
+        'cliente_marketing_whatssapp',
     ];
 
     protected $hidden = [
@@ -35,11 +36,11 @@ class Cliente extends Authenticatable
     // Relacionamentos
     public function enderecos()
     {
-        return $this->hasMany(Endereco::class, 'cliente_id', 'cliente_id');
+        return $this->hasMany(EnderecoModel::class, 'endereco_cliente', 'cliente_id');
     }
 
     public function pedidos()
     {
-        return $this->hasMany(Pedido::class, 'cliente_id', 'cliente_id');
+        return $this->hasMany(PedidoModel::class, 'cliente_id', 'cliente_id');
     }
 }
