@@ -8,12 +8,19 @@
     ?>
     <div class="brand">
         <div class="logo" aria-hidden="true">
-            <?php $config = $config ?? (object)[];  if ($config->config_foto != '') {
-                // Verificar se o arquivo existe
-                $logoPath = __DIR__ . '/../../midias/logo/' . $_SESSION['base_delivery'] . '/' . $config->config_foto;
+            <?php
+            $config = $config ?? (object)[];
+            // Definir base_delivery se não existir na sessão
+            if (!isset($_SESSION['base_delivery'])) {
+                $_SESSION['base_delivery'] = $config->config_token ?? 'default';
+            }
+
+            if ($config->config_foto != '') {
+                // Caminho seguro para logo
+                $logoPath = public_path('midias/logo/' . $_SESSION['base_delivery'] . '/' . $config->config_foto);
                 $logoUrl = file_exists($logoPath)
-                    ? $baseUri . '/midias/logo/' . $_SESSION['base_delivery'] . '/' . $config->config_foto
-                    : $baseUri . '/midias/img/sem_foto.jpg';
+                    ? asset('midias/logo/' . $_SESSION['base_delivery'] . '/' . $config->config_foto)
+                    : asset('midias/img/sem_foto.jpg');
             ?>
                 <a href="<?= $baseUri ?>" id="brand-logo">
                     <?php $config = $config ?? (object)[];  if ($isNatal): ?>

@@ -6,20 +6,10 @@
 $isMobile = preg_match('/Mobile|Android|iPhone|iPad/', request()->header('User-Agent'));
 @endphp
     <div class="container" id="home-content">
+        @include('site.components.menu')
         <div class="<?= (!$isMobile) ? 'col-md-offset-2 col-md-8' : ''; ?>">
-            @if($errors->any())
-                <div class="alert alert-danger">
-                    <button type="button" class="close" data-dismiss="alert">&times;</button>
-                    <ul style="margin: 0; padding-left: 20px;">
-                        @foreach($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-            <form action="{{ url('/endereco/gravar') }}" method="post" role="form" autocomplete="off" enctype="multipart/form-data">
+            <form action="{{ url('/endereco/gravar') }}{{ ($return != '') ? '?return=' . $return : '' }}" method="post" role="form" autocomplete="off" enctype="multipart/form-data">
                 @csrf
-                <input type="hidden" name="return" value="<?= $return ?>">
                 <input type="hidden" name="endereco_cliente" id="endereco_cliente" value="<?= $cliente->cliente_id ?>">
                 <br />
                 <h4 class="text-danger text-uppercase text-center">
@@ -100,46 +90,31 @@ $isMobile = preg_match('/Mobile|Android|iPhone|iPad/', request()->header('User-A
                     <br />
                     <button class="btn btn-success btn-block btn-endereco-gravar" type="submit">
                         <i class="fa fa-check-circle-o"></i> CADASTRAR
-                        <?= (isset($return) && $return != "pedido") ? 'ENDEREÇO ' : ' E CONCLUIR PEDIDO'; ?>
+                        <?= (isset($data['return']) && $data['return'] != "pedido") ? 'ENDEREÇO ' : ' E CONCLUIR PEDIDO'; ?>
                     </button>
                 </div>
             </form>
         </div>
     </div>
-    {{-- Modal CEP e outros componentes já estão no layout --}}
+    <?php
+    require 'modal-cep-entrega.php';
+    require_once 'footer.php';
+    require 'side-carrinho.php';
+    ?>
     <script type="text/javascript">
-        var baseUri = '{{ url('/') }}';
         var currentUri = 'index';
-
-        // Garantir que o evento change funcione
-        $(document).ready(function() {
-            console.log('DOM Ready - Registrando evento do bairro');
-
-            $('#endereco_bairro').on('change', function() {
-                var cidade = $('#endereco_bairro option:selected').data('cidade');
-                var bairro = $('#endereco_bairro option:selected').data('bairro');
-
-                console.log('Bairro selecionado:', {
-                    cidade: cidade,
-                    bairro: bairro
-                });
-
-                $('#endereco_cidade').val(cidade);
-                $('#endereco_bairro_id').val(bairro);
-
-                console.log('Campos hidden preenchidos:', {
-                    endereco_cidade: $('#endereco_cidade').val(),
-                    endereco_bairro_id: $('#endereco_bairro_id').val()
-                });
-            });
-        });
     </script>
-    <script type="text/javascript" src="{{ asset('view/site/app-js/endereco.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('view/site/app-js/pedido.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('view/site/app-js/number.js') }}"></script>
-    <script src="{{ asset('view/site/app-js/howler.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('view/site/app-js/carrinho.js') }}"></script>
+    <?php require_once 'footer-core-js.php'; ?>
+    <script type="text/javascript" src="{{ asset('assets/js/endereco.js"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/pedido.js"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/number.js"></script>
+    <script src="{{ asset('assets/js/howler.js"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/carrinho.js"></script>
     <script type="text/javascript">
+
+
         rebind_reload();
     </script>
-@endsection
+</body>
+
+</html>

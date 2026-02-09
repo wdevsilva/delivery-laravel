@@ -98,6 +98,12 @@ Route::get('/promocoes', [ItemController::class, 'promocoes'])->name('promocoes'
 Route::get('/item/{id}', [ItemController::class, 'show'])->name('item.show');
 Route::get('/categoria/{id}', [App\Http\Controllers\CategoriaController::class, 'show'])->name('categoria.show');
 
+// Local / Entrega
+Route::post('/local/get_preco_entrega', [App\Http\Controllers\LocalController::class, 'getPrecoEntrega'])->name('local.preco_entrega');
+Route::get('/novo-endereco', [App\Http\Controllers\LocalController::class, 'novoEndereco'])->name('local.novo_endereco');
+Route::get('/meus-enderecos', [App\Http\Controllers\LocalController::class, 'listaEnderecos'])->name('local.lista_enderecos');
+Route::post('/endereco/gravar', [App\Http\Controllers\LocalController::class, 'gravarEndereco'])->name('local.gravar_endereco');
+
 // Carrinho (público)
 Route::prefix('carrinho')->group(function () {
     Route::get('/', [CarrinhoController::class, 'index'])->name('carrinho.index');
@@ -123,12 +129,21 @@ Route::prefix('cupom')->group(function () {
     Route::post('/aplicar', [CupomController::class, 'aplicar'])->name('cupom.aplicar');
 });
 
+// API Cupom Ativo (compatibilidade)
+Route::get('/api-cupom-ativo.php', [CupomController::class, 'apiCupomAtivo'])->name('api.cupom.ativo');
+
 // Área do Cliente (SEM AUTH TEMPORÁRIAMENTE)
 Route::group([], function () {
     // Checkout / Finalizar Pedido
     Route::get('/pedido', [PedidoController::class, 'checkout'])->name('pedido.checkout');
+    Route::post('/pedido/confirmar', [PedidoController::class, 'confirmar'])->name('pedido.confirmar');
     Route::post('/pedido/finalizar', [PedidoController::class, 'finalizar'])->name('pedido.finalizar');
     Route::post('/pedido/aplica_cupom', [PedidoController::class, 'aplicaCupom'])->name('pedido.aplicar_cupom');
+
+    // Detalhes do Pedido
+    Route::get('/meus-pedidos', [PedidoController::class, 'lista'])->name('pedido.lista');
+    Route::get('/detalhes-do-pedido/{id}', [PedidoController::class, 'detalhesPedido'])->name('pedido.detalhes');
+    Route::get('/pedido/status/{id}', [PedidoController::class, 'statusApi'])->name('pedido.status_api');
 
     Route::get('/meus-pedidos', [PedidoController::class, 'lista'])->name('cliente.pedidos');
     Route::get('/pedido/{id}', [PedidoController::class, 'detalhes'])->name('cliente.pedido.detalhes');

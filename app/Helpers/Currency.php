@@ -4,31 +4,15 @@ namespace App\Helpers;
 
 class Currency
 {
-    static function moedaArr($key, $data)
+    public static function moeda($valor, $decimals = 2, $dec_point = ',', $thousands_sep = '.')
     {
-        foreach ($data as $k => $v) {
-            $data[$k][$key] = number_format($data[$k][$key], 2, ',', '.');
-        }
-        return $data;
+        return number_format((float)$valor, $decimals, $dec_point, $thousands_sep);
     }
 
-    static function moeda($valor, $mostrar_zero = false)
+    public static function moedaUS($valor)
     {
-        return $valor ? number_format(floatval($valor), 2, ',', '.') : ($mostrar_zero ? '0,00' : '');
-    }
-
-    static function moedaUS($valor, $mostrar_zero = true)
-    {
-        return $valor ? number_format(floatval($valor), 2, '.', ',') : ($mostrar_zero ? '0' : '');
-    }
-
-    static function caracteresEsquerda($string, $num)
-    {
-        return substr($string, 0, $num);
-    }
-
-    static function caracteresDireita($string, $num)
-    {
-        return substr($string, strlen($string) - $num, $num);
+        $v = str_replace('.', '', $valor);
+        $v = str_replace(',', '.', $v);
+        return $v;
     }
 }

@@ -15,7 +15,7 @@
     <meta property="og:title" content="{{ $config->config_nome ?? '' }}" />
     <meta property="og:description" content="{{ $config->config_site_description ?? 'Cardápio Completo' }}" />
     <meta property="og:image"
-        content="{{ asset('assets/logo/' . session('base_delivery') . '/' . $config->config_foto) }}" />
+        content="{{ asset('midias/logo/' . session('base_delivery') . '/' . $config->config_foto) }}" />
     <meta property="og:image:width" content="200" />
     <meta property="og:image:height" content="200" />
     <meta property="og:url" content="{{ url('/') }}" />
@@ -25,7 +25,7 @@
     <meta name="twitter:title" content="{{ $config->config_nome ?? '' }}" />
     <meta name="twitter:description" content="{{ $config->config_site_description ?? 'Cardápio Completo' }}" />
     <meta name="twitter:image"
-        content="{{ asset('assets/logo/' . session('base_delivery') . '/' . $config->config_foto) }}" />
+        content="{{ asset('midias/logo/' . session('base_delivery') . '/' . $config->config_foto) }}" />
 
     <link rel="manifest" id="mainManifest"
         href="{{ url('/generate-manifest.php?token=' . ($config->config_token ?? '')) }}" />
@@ -42,7 +42,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/produto.css') }}?v={{ time() }}" />
     <link rel="stylesheet" href="{{ asset('assets/css/modal-produto.css') }}?v={{ time() }}" />
     <link rel="icon" type="image/png"
-        href="{{ asset('assets/logo/' . session('base_delivery') . '/' . $config->config_foto) }}" />
+        href="{{ asset('midias/logo/' . session('base_delivery') . '/' . $config->config_foto) }}" />
     <link rel="stylesheet" href="{{ url('/assets/css/tema.php?' . ($config->config_colors ?? '')) }}"
         type="text/css" />
     <link href="{{ asset('assets/css/main.css') }}?v={{ time() }}" rel="stylesheet" />
@@ -63,7 +63,7 @@
     <!-- Loading Screen -->
     <div class="page-loader" id="pageLoader">
         <div class="loader-container">
-            <img src="{{ asset('assets/logo/' . session('base_delivery') . '/' . $config->config_foto) }}"
+            <img src="{{ asset('midias/logo/' . session('base_delivery') . '/' . $config->config_foto) }}"
                 alt="Logo" class="loader-logo">
             <div class="loader-text">Carregando...</div>
             <div class="loader-spinner"></div>

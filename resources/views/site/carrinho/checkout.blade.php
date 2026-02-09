@@ -5,9 +5,10 @@
 @session_start();
 $isMobile = preg_match('/Mobile|Android|iPhone|iPad/', request()->header('User-Agent'));
 @endphp
-    <div class="container" id="home-content">   
+    <div class="container" id="home-content">
         <div class="<?= (!$isMobile) ? 'col-md-offset-2 col-md-8' : ''; ?>">
-            <form action="{{ asset('pedido/confirmar/" method="post" id="form-pedido" onsubmit="return validaPagamento()">
+            <form action="{{ url('/pedido/confirmar') }}" method="post" id="form-pedido" onsubmit="return validaPagamento()">
+                @csrf
                 <input type="hidden" name="pedido_local" id="pega-endereco2" /><br>
                 <?php if ($config->config_aberto == 0) : ?>
                     <button class="btn btn-block btn-danger text-uppercase no-radius" type="button">
@@ -474,13 +475,13 @@ $isMobile = preg_match('/Mobile|Android|iPhone|iPad/', request()->header('User-A
                     <?php else : ?>
                         <div class="text-center">
                             <br><br><br>
-                            <img src="{{ asset('midias/thumb.php?zcx=3&w=218&h=178&src=img/icon-triste.png" alt="...">
+                            <img src="{{ asset('midias/thumb.php') }}?zcx=3&w=218&h=178&src=img/icon-triste.png" alt="...">
                         </div>
                         <div class="text-center">
                             <h4><b>Sacola Vazia</b></h4>
                             <p class="text-center">
                                 <br><br><br>
-                                <a href="{{ asset('" class="btn btn-warning btn-block text-uppercase">
+                                <a href="{{ url('/') }}" class="btn btn-warning btn-block text-uppercase">
                                     <i class="fa fa-shopping-cart"></i>
                                     Comece aqui o seu pedido
                                 </a>
@@ -502,8 +503,8 @@ $isMobile = preg_match('/Mobile|Android|iPhone|iPad/', request()->header('User-A
         </script>
     <?php endif; ?>
     <script type="text/javascript">
-        var baseUri = '{{ asset('') }}';
-        var BASE_URI = '{{ asset('') }}'; // Para compatibilidade com cupom-auto-monitor.js
+        var baseUri = '{{ url('/') }}';
+        var BASE_URI = '{{ url('/') }}'; // Para compatibilidade com cupom-auto-monitor.js
         // Usar total com descontos aplicados
         var totalCompra = '<?= number_format($total_com_desconto, 2, '.', '') ?>';
         var empresa = "<?= $_SESSION['base_delivery'] ?>";
@@ -533,7 +534,7 @@ $isMobile = preg_match('/Mobile|Android|iPhone|iPad/', request()->header('User-A
             });
         <?php endif; ?>
     </script>
-    <script type="text/javascript" src="{{ asset('assets/vendor/jquery.maskedinput/jquery.mask.js"></script>
+    <script type="text/javascript" src="{{ asset('assets/vendor/jquery.maskedinput/jquery.mask.js') }}"></script>
     <script>
         // Converte o JSON gerado no PHP para uma variável JS
         const faixasCartao = <?php echo json_encode([]); ?>;
@@ -606,8 +607,8 @@ $isMobile = preg_match('/Mobile|Android|iPhone|iPad/', request()->header('User-A
         var percentualDescontoFidelidade = 0;
         <?php endif; ?>
     </script>
-    <script type="text/javascript" src="{{ asset('view/site/app-js/carrinho.js"></script>
-    <script type="text/javascript" src="{{ asset('view/site/app-js/cupom-auto-monitor.js"></script>
+    <script type="text/javascript" src="{{ asset('view/site/app-js/carrinho.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('view/site/app-js/cupom-auto-monitor.js') }}"></script>
     <script type="text/javascript">
         // Call rebind_reload after carrinho.js is loaded
         rebind_reload();
@@ -782,9 +783,9 @@ $isMobile = preg_match('/Mobile|Android|iPhone|iPad/', request()->header('User-A
         }
     </script>
     <?php if (isset($pagamentos[0]) && is_object($pagamentos[0]) && ($pagamentos[0]->pagamento_status ?? 0) == 1) : ?>
-        <script type="text/javascript" src="{{ asset('view/site/app-js/card.js"></script>
-        <script type="text/javascript" src="{{ asset('view/site/app-js/pagseguro-checkout.js"></script>
-        <script type="text/javascript" src="{{ asset('view/site/app-js/pagseguro.js"></script>
+        <script type="text/javascript" src="{{ asset('view/site/app-js/card.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('view/site/app-js/pagseguro-checkout.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('view/site/app-js/pagseguro.js') }}"></script>
     <?php endif; ?>
     </div> <!-- fecha container -->
 @endsection

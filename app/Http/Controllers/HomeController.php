@@ -21,6 +21,14 @@ class HomeController extends Controller
         $this->configRepository = $configRepository;
         $this->categoriaRepository = $categoriaRepository;
         $this->produtoRepository = $produtoRepository;
+
+        // Definir base_delivery na sessão se não existir
+        @session_start();
+        if (!isset($_SESSION['base_delivery'])) {
+            $config = $configRepository->getConfig();
+            $_SESSION['base_delivery'] = $config->config_token ?? 'default';
+            session(['base_delivery' => $_SESSION['base_delivery']]);
+        }
     }
 
     public function index()
