@@ -3,9 +3,6 @@
 @section('content')
     <div class="container" role="main">
 
-        @include('site.components.topo')
-
-
         @include('site.produto.mais-vendidos', compact('maisVendidos'))
 
         <!-- Categorias -->

@@ -63,6 +63,17 @@ Route::get('/generate-manifest.php', function() {
     return response($content)->header('Content-Type', 'application/json');
 });
 
+// Autenticação Cliente
+Route::get('/entrar', [App\Http\Controllers\Auth\ClienteLoginController::class, 'index'])->name('cliente.login');
+Route::post('/cliente-login-entrar', [App\Http\Controllers\Auth\ClienteLoginController::class, 'entrar'])->name('cliente.login.entrar');
+Route::get('/sair', [App\Http\Controllers\Auth\ClienteLoginController::class, 'logout'])->name('cliente.logout');
+Route::get('/recupera-senha', [App\Http\Controllers\Auth\ClienteLoginController::class, 'recuperaSenha'])->name('cliente.recupera_senha');
+Route::post('/nova-senha', [App\Http\Controllers\Auth\ClienteLoginController::class, 'novaSenha'])->name('cliente.nova_senha');
+
+// Cadastro Cliente
+Route::get('/cadastro', [App\Http\Controllers\CadastroController::class, 'index'])->name('cadastro.index');
+Route::post('/cadastro/gravar', [App\Http\Controllers\CadastroController::class, 'gravar'])->name('cadastro.gravar');
+
 // Autenticação Admin
 Route::prefix('login')->group(function () {
     Route::get('/', [LoginController::class, 'index'])->name('login');
@@ -114,6 +125,11 @@ Route::prefix('cupom')->group(function () {
 
 // Área do Cliente (SEM AUTH TEMPORÁRIAMENTE)
 Route::group([], function () {
+    // Checkout / Finalizar Pedido
+    Route::get('/pedido', [PedidoController::class, 'checkout'])->name('pedido.checkout');
+    Route::post('/pedido/finalizar', [PedidoController::class, 'finalizar'])->name('pedido.finalizar');
+    Route::post('/pedido/aplica_cupom', [PedidoController::class, 'aplicaCupom'])->name('pedido.aplicar_cupom');
+
     Route::get('/meus-pedidos', [PedidoController::class, 'lista'])->name('cliente.pedidos');
     Route::get('/pedido/{id}', [PedidoController::class, 'detalhes'])->name('cliente.pedido.detalhes');
     Route::get('/meus-enderecos', [ClienteController::class, 'enderecos'])->name('cliente.enderecos');

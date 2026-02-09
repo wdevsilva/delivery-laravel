@@ -414,22 +414,76 @@
                                     concluir venda
                                 </a>
                             @else
-                                <a href="{{ url('/carrinho') }}"
+                                <a href="{{ url('/pedido') }}"
                                     class="btn btn-block btn-primary text-uppercase no-radius">
                                     <i class="fa fa-chevron-right"></i>
                                     <i class="fa fa-chevron-right"></i>
-                                    Concluir meu pedido
+                                    concluir meu pedido
                                 </a>
                             @endif
                         </div>
                     @endif
                 @else
-                    {{-- Loja Fechada --}}
-                    <div class="text-center" style="padding: 15px;">
-                        <div class="alert alert-danger">
-                            <i class="fa fa-clock-o"></i> Estamos fechados no momento
-                        </div>
-                    </div>
+                    <button class="btn btn-block btn-danger text-uppercase no-radius" type="button">
+                        <i class="fa fa-exclamation-triangle"></i> Estamos fechados!
+                        @php
+                        // Função para extrair horário de abertura
+                        $extrairHorario = function($configDia) {
+                            if (empty($configDia)) return null;
+                            $partes = explode(' ', $configDia);
+                            if (count($partes) < 2 || $partes[0] != 'on') return null;
+                            $horarios = explode('-', $partes[1]);
+                            return $horarios[0] ?? null;
+                        };
+
+                        // Mapa de dias da semana
+                        $horarios = [
+                            0 => $extrairHorario($dados['config']->config_domingo),
+                            1 => $extrairHorario($dados['config']->config_segunda),
+                            2 => $extrairHorario($dados['config']->config_terca),
+                            3 => $extrairHorario($dados['config']->config_quarta),
+                            4 => $extrairHorario($dados['config']->config_quinta),
+                            5 => $extrairHorario($dados['config']->config_sexta),
+                            6 => $extrairHorario($dados['config']->config_sabado),
+                        ];
+
+                        $agora = now();
+                        $diaAtual = $agora->dayOfWeek;
+                        $mensagemAbertura = null;
+
+                        // Busca próximo dia com horário de abertura
+                        for ($i = 0; $i < 7; $i++) {
+                            $diaCheck = ($diaAtual + $i) % 7;
+                            $horarioAbertura = $horarios[$diaCheck];
+
+                            if ($horarioAbertura) {
+                                try {
+                                    $abertura = \Carbon\Carbon::parse($horarioAbertura);
+
+                                    // Se for hoje
+                                    if ($i == 0) {
+                                        if ($abertura->greaterThan($agora)) {
+                                            $diff = $agora->diff($abertura);
+                                            $mensagemAbertura = 'Abriremos em ' . $diff->h . ' horas, ' . $diff->i . ' minutos';
+                                            break;
+                                        }
+                                    } else {
+                                        // Se for outro dia
+                                        $diasNomes = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
+                                        $nomeDia = $diasNomes[$diaCheck];
+                                        $mensagemAbertura = 'Abriremos na ' . $nomeDia . ' às ' . $horarioAbertura;
+                                        break;
+                                    }
+                                } catch (\Exception $e) {
+                                    continue;
+                                }
+                            }
+                        }
+                        @endphp
+                        @if($mensagemAbertura)
+                            <br><small>{{ $mensagemAbertura }}</small>
+                        @endif
+                    </button>
                 @endif
             </div>
         </div>

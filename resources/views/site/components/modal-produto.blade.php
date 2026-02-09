@@ -98,9 +98,20 @@ $foto_url = "midias/item/" . session('base_delivery') . "/$item_foto";
                         <?php } ?>
 
                         <?php
-                        // Se itemAll existe, mostra lista de sabores (para pizzas)
-                        if (isset($itemAll) && is_array($itemAll)) {
-                            foreach ($itemAll as $sab) :
+                        // CORREÇÃO: Se meia = 1, mostra SOMENTE o item clicado
+                        // Se meia > 1, mostra todos os sabores (pizza)
+                        if ($meia == 1) {
+                            // Apenas o produto clicado (sem lista de outros produtos)
+                            $itemParaMostrar = [is_object($item) ? $item : (object)$item];
+                        } elseif (isset($itemAll) && is_array($itemAll)) {
+                            // Pizza: mostra todos os sabores
+                            $itemParaMostrar = $itemAll;
+                        } else {
+                            $itemParaMostrar = [];
+                        }
+
+                        if (!empty($itemParaMostrar)) {
+                            foreach ($itemParaMostrar as $sab) :
                         ?>
                             <div class="lista-sabores lista-sab-{{ $item_id }}" data-preco="{{ floatval($sab->item_preco) }}">
                                 <label for="sab-<?= $sab->item_id ?>-<?= $iterator ?>">

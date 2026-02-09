@@ -660,9 +660,8 @@ class CarrinhoController extends Controller
         ];
 
         // Renderizar view e retornar HTML puro (como no sistema antigo)
-        $html = view('site.carrinho.side-carrinho-partial', compact('dados'))->render();
-        echo $html;
-        exit;
+        return view('site.carrinho.side-carrinho-partial', compact('dados'));
+
     }
 
     static public function minimo()

@@ -15,9 +15,11 @@ class Cliente extends Authenticatable
         'cliente_nome',
         'cliente_email',
         'cliente_fone',
+        'cliente_fone2',
         'cliente_cpf',
         'cliente_senha',
         'cliente_nasc',
+        'cliente_status',
     ];
 
     protected $hidden = [
