@@ -98,7 +98,7 @@
                             @endif
                         </div>
                         <div class="col-md-2 col-xs-5">
-                            R$ {{ \App\Helpers\Filter::moeda(($cart->item_preco ?? 0) * $cart->qtde) }}
+                            R$ {{ \App\Helpers\Filter::moeda(((floatval($cart->item_preco ?? 0) + floatval($cart->extra_preco ?? 0)) * $cart->qtde)) }}
                         </div>
                     </div>
                     <div class="row">
@@ -363,7 +363,7 @@
                         $total = 0;
                         foreach ($carrinho as $item) {
                             $item = (object) $item;
-                            $total += ($item->item_preco ?? 0) * ($item->qtde ?? 1);
+                            $total += ((floatval($item->item_preco ?? 0) + floatval($item->extra_preco ?? 0)) * ($item->qtde ?? 1));
                         }
                     @endphp
 
@@ -403,7 +403,7 @@
                                     $cartTotal = 0;
                                     if (isset($_SESSION['__APP__CART__'])) {
                                         foreach ($_SESSION['__APP__CART__'] as $item) {
-                                            $cartTotal += ($item->item_preco ?? 0) * ($item->qtde ?? 1);
+                                            $cartTotal += ((floatval($item->item_preco ?? 0) + floatval($item->extra_preco ?? 0)) * ($item->qtde ?? 1));
                                         }
                                     }
                                 @endphp

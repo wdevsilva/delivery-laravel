@@ -607,8 +607,8 @@ $isMobile = preg_match('/Mobile|Android|iPhone|iPad/', request()->header('User-A
         var percentualDescontoFidelidade = 0;
         <?php endif; ?>
     </script>
-    <script type="text/javascript" src="{{ asset('view/site/app-js/carrinho.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('view/site/app-js/cupom-auto-monitor.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/carrinho.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/cupom-auto-monitor.js') }}"></script>
     <script type="text/javascript">
         // Call rebind_reload after carrinho.js is loaded
         rebind_reload();

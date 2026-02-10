@@ -9,7 +9,7 @@
 <script type="text/javascript" src="{{ asset('assets/vendor/jquery.select2/dist/js/select2.js') }}"></script>
 <script type="text/javascript" src="{{ asset('assets/vendor/jquery.select2/dist/js/i18n/pt-BR.js') }}"></script>
 <script type="text/javascript" src="{{ asset('assets/vendor/jquery.maskedinput/jquery.maskedinput.js') }}"></script>
-<script type="text/javascript" src="{{ asset('view/site/app-js/main.js') }}"></script>
+<script type="text/javascript" src="{{ asset('assets/js/main.js') }}"></script>
 @if (session('cliente_id', 0) > 0)
     <script>
         function verificarAtualizacao(url, tituloAlerta) {

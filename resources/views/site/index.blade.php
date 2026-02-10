@@ -52,8 +52,6 @@
         @endauth
     </div>
 
-    <!-- Rodapé Fixo -->
-    @include('site.components.footer')
     @include('site.carrinho.side-carrinho')
     <script type="text/javascript">
         var currentUri = 'index';

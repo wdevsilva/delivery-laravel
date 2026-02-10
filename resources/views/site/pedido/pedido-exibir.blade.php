@@ -69,7 +69,7 @@
                             </p>
                         </div>
                         <div class="col-md-2 col-xs-5">
-                            R$ <?= \App\Helpers\Currency::moeda($cart->item_preco * $cart->lista_qtde) ?>
+                            R$ <?= \App\Helpers\Currency::moeda($cart->lista_opcao_preco * $cart->lista_qtde) ?>
                         </div>
                         <?php if (isset($cart->lista_promocao_id) != '') { ?>
                             <div class="text-capitalize well-sm well">

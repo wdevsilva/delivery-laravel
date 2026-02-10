@@ -33,9 +33,9 @@ class ConfigRepository
         return (isset($data[0])) ? $data[0] : null;
     }
 
-    public function get_valor_min()
+    public function get_valor_minimo_pedido()
     {
-        $query = DB::table('config')->where('config_id', 1);
+        $query = DB::table('config')->where('config_id', 1)->select('config_pedmin');
         $data = $query->get();
         return (isset($data[0])) ? $data[0]->config_pedmin : null;
     }

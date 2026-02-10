@@ -337,43 +337,55 @@ function updateSelectedItemsBar(itemId) {
     var $counter = $('#cart-count-' + itemId);
     var $popupBody = $('#popup-body-' + itemId);
     var $popupTotal = $('#popup-total-' + itemId);
+    var $popup = $('#popup-' + itemId);
 
-    // Sempre mostra a sacola se houver pelo menos o produto principal
-    if (count === 0) {
+    // Conta quantos são adicionais (não principal)
+    var additionalsCount = 0;
+    $.each(selectedItems, function(key, item) {
+        if (item.isPrincipal !== true) {
+            additionalsCount++;
+        }
+    });
+
+    // Se não tem itens OU só tem o produto principal (sem adicionais), fecha o popup
+    if (count === 0 || (count === 1 && additionalsCount === 0)) {
         $badge.removeClass('show');
-        $('#popup-' + itemId).removeClass('show');
+        $popup.removeClass('show');
+        if (count === 0) {
+            return;
+        }
     } else {
         $badge.addClass('show');
         $counter.text(count);
-
-        $popupBody.empty();
-        var totalGeral = 0;
-
-        $.each(selectedItems, function(key, item) {
-            var price = parseFloat(item.price) || 0;
-            var isPrincipal = item.isPrincipal || false;
-
-            // Soma TUDO no total (produto + extras)
-            totalGeral += price;
-
-            var priceText = '';
-            if (isPrincipal) {
-                priceText = 'R$ ' + price.toFixed(2).replace('.', ','); // Mostra preço do produto
-            } else {
-                priceText = price > 0 ? '+ R$ ' + price.toFixed(2).replace('.', ',') : 'Grátis';
-            }
-
-            var row = $('<div class="selected-item-row' + (isPrincipal ? ' produto-principal' : '') + '">' +
-                '<span class="item-name">' + item.name + '</span>' +
-                '<span class="item-price">' + priceText + '</span>' +
-                (isPrincipal ? '' : '<button class="remove-btn" data-key="' + key + '" data-item-id="' + itemId + '">×</button>') +
-                '</div>');
-
-            $popupBody.append(row);
-        });
-
-        $popupTotal.text('R$ ' + totalGeral.toFixed(2).replace('.', ','));
     }
+
+    $popupBody.empty();
+    var totalGeral = 0;
+
+    $.each(selectedItems, function(key, item) {
+        var price = parseFloat(item.price) || 0;
+        var isPrincipal = (item.isPrincipal === true); // Apenas se explicitamente true
+
+        // Soma TUDO no total (produto + extras)
+        totalGeral += price;
+
+        var priceText = '';
+        if (isPrincipal) {
+            priceText = 'R$ ' + price.toFixed(2).replace('.', ','); // Mostra preço do produto
+        } else {
+            priceText = price > 0 ? '+ R$ ' + price.toFixed(2).replace('.', ',') : 'Grátis';
+        }
+
+        var row = $('<div class="selected-item-row' + (isPrincipal ? ' produto-principal' : '') + '">' +
+            '<span class="item-name">' + item.name + '</span>' +
+            '<span class="item-price">' + priceText + '</span>' +
+            (isPrincipal ? '' : '<button class="remove-btn" data-key="' + key + '" data-item-id="' + itemId + '">×</button>') +
+            '</div>');
+
+        $popupBody.append(row);
+    });
+
+    $popupTotal.text('R$ ' + totalGeral.toFixed(2).replace('.', ','));
 }
 
 // Evento de clique no badge
@@ -397,7 +409,8 @@ $(document).on('click', '.floating-cart-badge', function(e) {
 // Fecha o popup ao clicar fora
 $(document).on('click', function(e) {
     if (!$(e.target).closest('.floating-cart-badge').length &&
-        !$(e.target).closest('.selected-items-popup').length) {
+        !$(e.target).closest('.selected-items-popup').length &&
+        !$(e.target).closest('.remove-btn').length) {
         $('.selected-items-popup').removeClass('show');
     }
 });
@@ -409,10 +422,16 @@ $(document).on('click', '.selected-items-popup', function(e) {
 
 // Remove item do popup
 $(document).on('click', '.remove-btn', function(e) {
+    e.preventDefault();
     e.stopPropagation();
+    e.stopImmediatePropagation();
+
     var key = $(this).data('key');
     var itemId = $(this).data('item-id');
     removeItemFromBar(key, itemId);
+
+    // Impede que o popup feche
+    return false;
 });
 
 function flyItemToBar(element, itemId, itemKey, itemName, itemPrice) {

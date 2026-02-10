@@ -695,7 +695,6 @@ $("#pedido_local").on("change", function() {
 
         // Verificar forma de pagamento
         var formaPagamento = $("#forma-pagamento").val();
-        console.log('[DEBUG RETIRAR LOCAL] Forma pagamento:', formaPagamento, 'Taxa atual:', taxa);
 
         // Se tinha cartão selecionado, recalcular com taxa de entrega = 0
         if (formaPagamento == 2 || formaPagamento == 3) {
@@ -723,7 +722,6 @@ $("#pedido_local").on("change", function() {
             $("#troco-bandeira").val('');
         }
     } else {
-        console.log('[DEBUG] Local não é retirar (local:', local, ')');
         // ✅ Calcular desconto de fidelidade para casos vazios/default
         var descontoFidelidade = 0;
         if (typeof temDescontoFidelidade !== 'undefined' && temDescontoFidelidade === true) {

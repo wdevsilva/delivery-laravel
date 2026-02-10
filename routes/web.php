@@ -1,19 +1,26 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ClienteLoginController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\PedidoController;
-use App\Http\Controllers\ClienteController;
-use App\Http\Controllers\CarrinhoController;
-use App\Http\Controllers\ItemController;
-use App\Http\Controllers\CupomController;
-use App\Http\Controllers\FidelidadeController;
-use App\Http\Controllers\CozinhaController;
+
 use App\Http\Controllers\Mesa\MesaController;
 use App\Http\Controllers\Mesa\GarconController;
+
+use App\Http\Controllers\Loja\HomeController;
+use App\Http\Controllers\Loja\ItemController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Loja\CupomController;
+use App\Http\Controllers\Loja\LocalController;
+use App\Http\Controllers\Loja\PedidoController;
+use App\Http\Controllers\Loja\ClienteController;
+use App\Http\Controllers\Loja\CozinhaController;
+use App\Http\Controllers\Loja\CadastroController;
+use App\Http\Controllers\Loja\CarrinhoController;
+use App\Http\Controllers\Loja\CategoriaController;
+use App\Http\Controllers\Loja\FidelidadeController;
+
+use App\Http\Controllers\Admin\DashboardController;
+
 
 // Home
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -64,15 +71,15 @@ Route::get('/generate-manifest.php', function() {
 });
 
 // Autenticação Cliente
-Route::get('/entrar', [App\Http\Controllers\Auth\ClienteLoginController::class, 'index'])->name('cliente.login');
-Route::post('/cliente-login-entrar', [App\Http\Controllers\Auth\ClienteLoginController::class, 'entrar'])->name('cliente.login.entrar');
-Route::get('/sair', [App\Http\Controllers\Auth\ClienteLoginController::class, 'logout'])->name('cliente.logout');
-Route::get('/recupera-senha', [App\Http\Controllers\Auth\ClienteLoginController::class, 'recuperaSenha'])->name('cliente.recupera_senha');
-Route::post('/nova-senha', [App\Http\Controllers\Auth\ClienteLoginController::class, 'novaSenha'])->name('cliente.nova_senha');
+Route::get('/entrar', [ClienteLoginController::class, 'index'])->name('cliente.login');
+Route::post('/cliente-login-entrar', [ClienteLoginController::class, 'entrar'])->name('cliente.login.entrar');
+Route::get('/sair', [ClienteLoginController::class, 'logout'])->name('cliente.logout');
+Route::get('/recupera-senha', [ClienteLoginController::class, 'recuperaSenha'])->name('cliente.recupera_senha');
+Route::post('/nova-senha', [ClienteLoginController::class, 'novaSenha'])->name('cliente.nova_senha');
 
 // Cadastro Cliente
-Route::get('/cadastro', [App\Http\Controllers\CadastroController::class, 'index'])->name('cadastro.index');
-Route::post('/cadastro/gravar', [App\Http\Controllers\CadastroController::class, 'gravar'])->name('cadastro.gravar');
+Route::get('/cadastro', [CadastroController::class, 'index'])->name('cadastro.index');
+Route::post('/cadastro/gravar', [CadastroController::class, 'gravar'])->name('cadastro.gravar');
 
 // Autenticação Admin
 Route::prefix('login')->group(function () {
@@ -96,13 +103,13 @@ Route::prefix('cliente')->group(function () {
 // Rotas Públicas - Cardápio e Produtos
 Route::get('/promocoes', [ItemController::class, 'promocoes'])->name('promocoes');
 Route::get('/item/{id}', [ItemController::class, 'show'])->name('item.show');
-Route::get('/categoria/{id}', [App\Http\Controllers\CategoriaController::class, 'show'])->name('categoria.show');
+Route::get('/categoria/{id}', [CategoriaController::class, 'show'])->name('categoria.show');
 
 // Local / Entrega
-Route::post('/local/get_preco_entrega', [App\Http\Controllers\LocalController::class, 'getPrecoEntrega'])->name('local.preco_entrega');
-Route::get('/novo-endereco', [App\Http\Controllers\LocalController::class, 'novoEndereco'])->name('local.novo_endereco');
-Route::get('/meus-enderecos', [App\Http\Controllers\LocalController::class, 'listaEnderecos'])->name('local.lista_enderecos');
-Route::post('/endereco/gravar', [App\Http\Controllers\LocalController::class, 'gravarEndereco'])->name('local.gravar_endereco');
+Route::post('/local/get_preco_entrega', [LocalController::class, 'getPrecoEntrega'])->name('local.preco_entrega');
+Route::get('/novo-endereco', [LocalController::class, 'novoEndereco'])->name('local.novo_endereco');
+Route::get('/meus-enderecos', [LocalController::class, 'listaEnderecos'])->name('local.lista_enderecos');
+Route::post('/endereco/gravar', [LocalController::class, 'gravarEndereco'])->name('local.gravar_endereco');
 
 // Carrinho (público)
 Route::prefix('carrinho')->group(function () {
@@ -114,9 +121,9 @@ Route::prefix('carrinho')->group(function () {
     Route::post('/finalizar', [CarrinhoController::class, 'finalizar'])->name('carrinho.finalizar');
 
     // Rotas AJAX para atualização do carrinho
-    Route::match(['GET', 'POST'], '/reload', [CarrinhoController::class, 'reload']);
-    Route::match(['GET', 'POST'], '/get_count_js', [CarrinhoController::class, 'getCountJs']);
-    Route::match(['GET', 'POST'], '/get_count_bag', [CarrinhoController::class, 'getCountBag']);
+    Route::match(['GET', 'POST'], '/reload', [CarrinhoController::class, 'reload'])->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+    Route::match(['GET', 'POST'], '/get_count_js', [CarrinhoController::class, 'getCountJs'])->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+    Route::match(['GET', 'POST'], '/get_count_bag', [CarrinhoController::class, 'getCountBag'])->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
     Route::post('/dispensar_bebidas', [CarrinhoController::class, 'dispensar_bebidas']);
     Route::post('/add_more', [CarrinhoController::class, 'add_more']);
     Route::post('/del_more', [CarrinhoController::class, 'del_more']);

@@ -33,7 +33,7 @@ $baseUri = url("/");
         </div>
 
         <!-- só vai mostrar se não tiver na tela de checkout -->
-        <?php if ($current != 'pedido/') { ?>
+        @if ($current != 'pedido/')
             <!-- carrinho -->
             <div data-v-0c8898ec="" data-v-42af03df="">
                 <div data-v-0c8898ec="" class="mi-container flex justify-around router-link-active pt-1" data-testid="router-link-menu"><span data-v-1267300e="" data-v-0c8898ec="" data-testid="span-menu" class="mi-container radius-2 flex justify-around">
@@ -49,8 +49,8 @@ $baseUri = url("/");
                     </span></div>
                 <div data-v-66839ce5="" data-v-0c8898ec="" role="dialog" class="modal-backdrop flex" style="display: none;"></div>
             </div>
-        <?php } ?>
-        <?php if (isset($_SESSION["__CLIENTE__ID__"]) && $_SESSION["__CLIENTE__ID__"] > 0) { ?>
+        @endif
+        @if (isset($_SESSION["__CLIENTE__ID__"]) && $_SESSION["__CLIENTE__ID__"] > 0)
 
             <!-- PEDIDOS -->
             <div data-v-0c8898ec="" data-v-42af03df="">
@@ -182,6 +182,6 @@ $baseUri = url("/");
                     </a>
                 </div>
             </div>
-        <?php } ?>
+        @endif
     </div>
 </div>

@@ -28,6 +28,11 @@ class TenantResolver
             $token = session('delivery_token');
         }
 
+        // Se não tem token, retorna 404
+        if (!$token) {
+            abort(404);
+        }
+
         if ($token) {
             try {
                 // Conecta ao banco principal para buscar a base do tenant
@@ -60,23 +65,15 @@ class TenantResolver
 
                     // Reconecta ao banco do tenant
                     $this->switchTenantDatabase($base->base, $base->prefix ?? '');
+                } else {
+                    // Token inválido ou base inativa
+                    abort(404);
                 }
             } catch (\Exception $e) {
-                // Log erro mas continua com base padrão
+                // Erro ao resolver tenant
                 Log::error('Erro ao resolver tenant: ' . $e->getMessage());
+                abort(404);
             }
-        }
-
-        // Se não tem token ou não encontrou, usa base da sessão ou padrão
-        if (!session()->has('base_delivery')) {
-            $defaultBase = explode(',', env('BASES', 'default'))[0];
-            session(['base_delivery' => $defaultBase]);
-            $this->switchTenantDatabase($defaultBase, '');
-        } else {
-            $this->switchTenantDatabase(
-                session('base_delivery'),
-                session('prefix_delivery', '')
-            );
         }
 
         return $next($request);

@@ -84,6 +84,7 @@
     <script src="{{ asset('assets/vendor/bootstrap/3.3.5/js/bootstrap.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/jquery.select2/dist/js/select2.full.min.js') }}"></script>
     <script src="{{ asset('assets/vendor/jquery.gritter/js/jquery.gritter.js') }}"></script>
+    <script src="{{ asset('assets/vendor/jquery.maskedinput/jquery.maskedinput.js') }}"></script>
     <script src="{{ asset('assets/vendor/slick/slick.min.js') }}"></script>
     <script src="{{ asset('assets/js/howler.js') }}"></script>
     <script src="{{ asset('assets/js/modal-produto.js') }}"></script>
@@ -111,6 +112,20 @@
             },
             headers: {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        });
+
+        // Atualizar contador do carrinho ao carregar página
+        $(document).ready(function() {
+            if (typeof rebind_get_count === 'function') {
+                rebind_get_count();
+            } else {
+                // Tentar novamente após 1 segundo
+                setTimeout(function() {
+                    if (typeof rebind_get_count === 'function') {
+                        rebind_get_count();
+                    }
+                }, 1000);
             }
         });
     </script>

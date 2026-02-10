@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Cliente;
+use App\Models\ClienteModel;
 use App\Models\ConfigModel;
 use Illuminate\Http\Request;
 
@@ -41,12 +41,12 @@ class ClienteLoginController extends Controller
         }
 
         // Tentar buscar primeiro com formatação (como veio)
-        $cliente = Cliente::where('cliente_fone2', $cliente_fone)->first();
+        $cliente = ClienteModel::where('cliente_fone2', $cliente_fone)->first();
 
         // Se não achou, tentar sem formatação
         if (!$cliente) {
             $cliente_fone_limpo = preg_replace('/[^0-9]/', '', $cliente_fone);
-            $cliente = Cliente::where('cliente_fone2', $cliente_fone_limpo)->first();
+            $cliente = ClienteModel::where('cliente_fone2', $cliente_fone_limpo)->first();
         }
 
         if ($cliente) {

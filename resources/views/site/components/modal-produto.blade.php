@@ -43,7 +43,7 @@ $foto_url = "midias/item/" . session('base_delivery') . "/$item_foto";
             <div class="selected-items-popup" id="popup-{{ $item_id }}">
                 <div class="selected-items-popup-header">
                     <span>Itens Selecionados</span>
-                    <button class="close-popup" onclick="$('#popup-{{ $item_id }}').removeClass('show')">×</button>
+                    <button class="close-popup" onclick="event.stopPropagation(); $('#popup-{{ $item_id }}').removeClass('show'); return false;">×</button>
                 </div>
                 <div class="selected-items-popup-body" id="popup-body-{{ $item_id }}">
                     <!-- Itens serão inseridos aqui via JS -->

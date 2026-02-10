@@ -11,7 +11,7 @@
         <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700' rel='stylesheet' type='text/css'>
         <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
         <!--[if lt IE 9]>
-                <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>        
+                <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
         <![endif]-->
         <!--[if lt IE 9]>
                 <script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script>
@@ -26,7 +26,7 @@
                 <div class="panel panel-danger" id="painel-carrinho">
                     <div class="panel-heading well well-lg">
                         <h3>
-                            <i class="fa fa-shopping-cart fa-2x text-write"></i> 
+                            <i class="fa fa-shopping-cart fa-2x text-write"></i>
                             Itens de compra do seu carrinho<br/><br/><br/><br/>
                         </h3>
                     </div>
@@ -38,7 +38,7 @@
                                 </div>
                                 <div class="col-md-8 col-xs-12">
                                     <span class="item-span">
-                                        <i class="fa fa-minus-circle btn-plus-minus text-danger" data-toggle="tooltip" title="-1"></i> 01 
+                                        <i class="fa fa-minus-circle btn-plus-minus text-danger" data-toggle="tooltip" title="-1"></i> 01
                                         <i class="fa fa-plus-circle  btn-plus-minus text-success" data-toggle="tooltip" title="+1"></i> &nbsp;
                                         <span data-toggle="tooltip" title="<?= $item->item_nome ?> - 04 Unidades"><?= $item->item_nome ?>... <span class="pull-right mar-right-3"><?= $item->opcao_preco ?></span></span>
                                     </span>
@@ -53,5 +53,5 @@
     </body>
     <script type="text/javascript" src="<?php echo $baseUri; ?>/assets/vendor/jquery/jquery-2.1.4.min.js"></script>
     <script type="text/javascript" src="<?php echo $baseUri; ?>/assets/vendor/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="{{ asset('assets/js/main.js"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/main.js') }}"></script>
 </html>
